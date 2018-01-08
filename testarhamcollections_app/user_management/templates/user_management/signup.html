@@ -1,0 +1,67 @@
+{%extends 'main_app/blankbase.html' %}
+{% block content%}
+
+<div class="row">
+	<div class="col s12 m2 l3">
+	</div>
+	<div class="col s12 m8 l6">
+		<div class="row">
+		<div class="valign-wrapper">
+			<div class="card-panel z-depth-4">
+				<div class="row">
+					<h5 class="center-align">Signup @<a href={{ url_for('main_app.home') }}> Arhamcollections</a>, </h5>
+{# 					<form action ="{{url_for('user_management.register')}}" method="POST">
+					
+					{{ form.csrf_token }}
+					{{form.email}}
+					{{form.password}}
+					{{form.confirm_password}}
+					
+					<input id="submit" name="submit" type="submit" value="Add" class="btn btn-danger">
+					</form>
+ #}
+					<form action="{{url_for('user_management.signudp')}}" class ="col s12" method="POST">{{ form.csrf_token }}
+
+						<div class="input-field col s12">
+							{# <i class="material-icons prefix">account_circle</i> #}
+							
+							<input id="email" type="text" name ="email" class="validate">
+							<label for="email">Email</label>
+						</div>
+						<div class="input-field col s12">
+							{# <i class="material-icons prefix">vpn_key</i> #}
+							<input id="password" name="password" type="password">
+							<label for="password">Password</label>
+						</div>
+						<div class="input-field col s12">
+							{# <i class="material-icons prefix">vpn_key</i> #}
+							<input id="confirm_password" type="password" name ="confirm_password">
+							<label for="confirm_password">Confirm Password</label>
+						</div>
+						<div class="input-field col s12">
+							<button type="submit" class="btn cyan waves-effect waves-light col s12">Signup</button>
+						</div>
+					</form>
+
+				</div>
+				<div>
+				<p> You already have account with us, Go ahead and <a href={{ url_for('user_management.login') }}>Signin </a></p>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+	<div class="col s12 m2 l3">
+	</div>
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
