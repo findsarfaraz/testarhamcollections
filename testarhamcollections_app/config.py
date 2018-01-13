@@ -21,11 +21,11 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI ='mysql://root:welcome@123@localhost:3306/flasktestarham'
 
     MAIL_SERVER='arhamcollections.com'
-    MAIL_PORT='465'
+    MAIL_PORT=465
     MAIL_USERNAME='registration@arhamcollections.com'
     MAIL_PASSWORD = 'welcome@123'
-    EMAIL_USE_TLS = False
-    EMAIL_USE_SSL = True
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
 
 class DefaultConfig(Config):
 

@@ -8,3 +8,4 @@ login_manager=LoginManager()
 from flask_mail import Mail
 mail = Mail()
 
+

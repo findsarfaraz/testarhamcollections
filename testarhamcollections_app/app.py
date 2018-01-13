@@ -29,7 +29,6 @@ def create_app(config=None, app_name=None, blueprints=None):
 	configure_extensions(app)
 	return app
 
-
 def configure_app(app, config=None):  
 
 	app.config.from_object(Config.DevelopmentConfig)
@@ -51,7 +50,7 @@ def configure_extensions(app):
 # 	pass
 	db.init_app(app)
 	mail.init_app(app)
-	
+
 	# login_manager.init_app(app)
 
 	# @login_manager.user_loader

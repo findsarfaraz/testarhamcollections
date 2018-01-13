@@ -9,21 +9,23 @@ from ..user_management.models import User,Userprofile,Userroles
 from ..extensions import mail
 from flask_mail import Message
 
-
+from ..user_management.views import send_confirmation_email
 
 
 
 @main_app.route("/", methods=['GET', 'POST'])
 def home():
+	# send_confirmation_email('admin@arhamcollections.com')
 	return render_template('main_app/index.html')
 	# ,lsts=lsts,form=form,form1=form1)
 	# return  "<h1>This is test</h1>"
 
 @main_app.route("faq", methods=['GET', 'POST'])
 def faq():
-	msg = Message('Hello', sender = 'registration@arhamcollections.com', recipients = ['findsarfaraz@gmail.com'])
-	msg.body = "Hello Flask message sent from Flask-Mail"
-	mail.send(msg)
+
+	#msg = Message('Hello', sender = 'registration@arhamcollections.com', recipients = ['findsarfaraz@gmail.com'])
+	# msg.body = "Hello Flask message sent from Flask-Mail"
+	# mail.send(msg)
 	return render_template('main_app/faq.html')
 
 @main_app.route("create")
