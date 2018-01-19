@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request
-from forms import SignupForm, LoginForm
+from forms import SignupForm, LoginForm, ProfileForm
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import User, Userroles, Userrolesmapping
 from ..extensions import db, login_manager
@@ -127,7 +127,14 @@ def confirm_email(token):
     return redirect(url_for('user_management.login'))
 
 
-@user_management.route("userprofile")
+@user_management.route("edituserprofile", methods=['GET', 'POST'])
 @login_required
-def userprofile():
-    return render_template('user_management/userprofile.html')
+def edituserprofile():
+    form = ProfileForm()
+    return render_template('user_management/edituserprofile.html', form=form)
+
+
+@user_management.route("accountpage", methods=['GET', 'POST'])
+@login_required
+def accountpage():
+    return render_template('user_management/accountpage.html')

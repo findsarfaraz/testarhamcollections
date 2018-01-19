@@ -1,0 +1,59 @@
+{%extends 'main_app/base.html' %}
+{% block content%}
+
+
+<div class="row">
+	<div class="col s12 m4 l3">
+		<a href={{ url_for('user_management.edituserprofile') }}>
+			<div class="card-panel z-depth-4">
+				<span class="red-text"><h5>Your Profile</h5>
+				</span>
+				<p>This help us know you better.</p>
+			</div>
+		</a>
+	</div>
+	<div class="col s12 m4 l3">
+		<a href="#">
+			<div class="card-panel z-depth-4">
+				<span class="red-text"><h5>Your Addresses</h5>
+				</span>
+				<p>Your addresses help you in quick checkout.</p>
+			</div>
+		</a>
+	</div>
+	<div class="col s12 m4 l3">
+		<a href="#">
+			<div class="card-panel z-depth-4">
+			<span class="red-text"><h5>Change Password</h5>
+			</span>
+			<p>Keep your account safe.</p>
+			</div>
+		</a>
+	</div>
+	<div class="col s12 m4 l3">
+		<a href="#">
+			<div class="card-panel z-depth-4">
+			<span class="red-text"><h5>Wish List</h5>
+			</span>
+			<p>Planning your shopping. Keep here whatever you like and want to buy.</p>
+			</div>
+		</a>
+	</div>
+</div>
+<div class="row">
+	<div class="col s12 m4 l3">
+		<a href="#">
+			<div class="card-panel z-depth-4">
+			<span class="red-text"><h5>Your Orders</h5>
+			</span>
+			<p>Check status of your orders</p>
+			</div>
+		</a>
+	</div>
+
+</div>
+	
+
+
+{% endblock %}
+
