@@ -38,6 +38,11 @@
 <script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/fontawesome-all.js')}}"></script>
 <script>$(".button-collapse").sideNav();</script>
 <script>  $('select').material_select();</script>
+<!-- <script>
+var $datepicker = $('#dateofbirth');
+$datepicker.datepicker();
+$datepicker.datepicker('setDate', "01/01/2016");
+</script> -->
 <script>
   $('.datepicker').pickadate({
     format: 'dd/mm/yyyy',
@@ -48,7 +53,9 @@
     close: 'Ok',
     closeOnSelect: false // Close upon selecting a date,
   });
+
 </script> 
+
 <script>
   $('.dropdown-button').dropdown({
 

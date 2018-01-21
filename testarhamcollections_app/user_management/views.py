@@ -143,9 +143,10 @@ def edituserprofile():
         userprofile.gender = form.gender.data
         userprofile.mobile_number = form.mobile_number.data
         userprofile.dateofbirth = form.dateofbirth.data
-        print userprofile.dateofbirth
         db.session.add(userprofile)
         db.session.commit()
+        form = ProfileForm(obj=userprofile)
+        form.populate_obj(userprofile)
         return render_template('user_management/edituserprofile.html', form=form)
     return render_template('user_management/edituserprofile.html', form=form)
 
@@ -154,3 +155,13 @@ def edituserprofile():
 @login_required
 def accountpage():
     return render_template('user_management/accountpage.html')
+
+
+@user_management.route("addresslist", methods=['GET'])
+@login_required
+def addresslist():
+    pass
+
+
+def addaddress():
+    pass
