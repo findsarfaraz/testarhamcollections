@@ -1,5 +1,5 @@
 from flask_wtf import Form, FlaskForm
-from wtforms import StringField, PasswordField, SelectField
+from wtforms import StringField, PasswordField, SelectField, DateField
 
 
 class SignupForm(FlaskForm):
@@ -18,3 +18,4 @@ class ProfileForm(FlaskForm):
     last_name = StringField("Last Name")
     gender = SelectField("Gender", choices=[('male', 'Male'), ('female', 'Female')])
     mobile_number = StringField("Contact No")
+    dateofbirth = DateField("Date Of Birth", format='%d/%m/%Y')

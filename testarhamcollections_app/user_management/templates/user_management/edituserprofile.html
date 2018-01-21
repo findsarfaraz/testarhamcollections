@@ -1,6 +1,6 @@
 {%extends 'main_app/base.html' %}
 {% block content%}
-
+<h1>{{current_user.email}}</h1>
 <div class="row">
 	<div class="row">
 		<div class="card-panel grey lighten-2 col s12 m8 l6 offset-l3 m2">
@@ -8,39 +8,39 @@
 			</span>
 		</div>
 	</div>
-	<form method="POST">
+	<form action="{{url_for('user_management.edituserprofile')}}" method="POST">{{ form.csrf_token }}
 		<div class="row">
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="first_name" type="text" class="validate">
+					<input id="first_name" type="text" name="first_name" value={{form.first_name.data}}>
 					<label for="first_name">First Name</label>
 				</div>
 			</div>
 			<div class="row">	
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="last_name" type="text" class="validate">
+					<input id="last_name" type="text" name="last_name" value={{form.last_name.data}}>
 					<label for="last_name">Last Name</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l4 offset-l3 m2">
-					<select>
-						<option value="" disable-selected>Select Gender</option>
-						<option value="female">Female</option>
-						<option value="male">Male</option>
+					<select id="gender" name="gender" value={{form.gender.data}}>>
+						<option value="" disable selected>Select Gender</option>
+						<option value="female" {%if form.gender.data=="female"%}{{"selected"}}{% endif%}>Female</option>
+						<option value="male" {%if form.gender.data=="male"%}{{"selected"}}{% endif%}>Male</option>
 					</select>
 					<label>Gender</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="mobilenumber" type="text" class="validate">
-					<label for="mobilenumber">Moblie Number</label>
+					<input id="mobile_number" type="text" name="mobile_number" value={{form.mobile_number.data}}>
+					<label for="mobile_number">Moblie Number</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input type="text" id ="dateofbirth" class="datepicker">
+					<input id="dateofbirth" name="dateofbirth" type="date" class="datepicker" value={{form.dateofbirth.data}}>
 					<label for="dateofbirth">Date of Birth</label>
 				</div>
 			</div>
@@ -50,7 +50,6 @@
 				</div>
 			</div>
 		</div>
-
 	</form>
 </div>
 	
@@ -58,3 +57,4 @@
 
 {% endblock %}
 
+/

@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request
 from forms import SignupForm, LoginForm, ProfileForm
 from werkzeug.security import check_password_hash, generate_password_hash
-from models import User, Userroles, Userrolesmapping
+from models import User, Userroles, Userrolesmapping, Userprofile
 from ..extensions import db, login_manager
 
 from itsdangerous import URLSafeTimedSerializer
 from ..extensions import mail
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
 from flask_mail import Message
 import random
@@ -67,6 +67,10 @@ def signup():
                 user_role_mapping = Userrolesmapping(user_id=data.id, role_id=userrole.role_id)
                 db.session.add(user_role_mapping)
                 db.session.commit()
+
+                userprofile = Userprofile(user_id=data.id)
+                db.session.add(userprofile)
+                db.session.commit
 
                 send_confirmation_email(email)
             except exc.IntegrityError:
@@ -130,7 +134,19 @@ def confirm_email(token):
 @user_management.route("edituserprofile", methods=['GET', 'POST'])
 @login_required
 def edituserprofile():
-    form = ProfileForm()
+    userprofile = Userprofile.query.filter_by(user_id=current_user.id).first()
+    form = ProfileForm(obj=userprofile)
+    form.populate_obj(userprofile)
+    if form.validate_on_submit():
+        userprofile.first_name = form.first_name.data
+        userprofile.last_name = form.last_name.data
+        userprofile.gender = form.gender.data
+        userprofile.mobile_number = form.mobile_number.data
+        userprofile.dateofbirth = form.dateofbirth.data
+        print userprofile.dateofbirth
+        db.session.add(userprofile)
+        db.session.commit()
+        return render_template('user_management/edituserprofile.html', form=form)
     return render_template('user_management/edituserprofile.html', form=form)
 
 

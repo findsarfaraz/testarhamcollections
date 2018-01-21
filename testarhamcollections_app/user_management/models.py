@@ -39,8 +39,7 @@ class Userprofile(db.Model):
     mobile_number = db.Column(db.String(15))
     creation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     updation_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow())
-    dateofbirth = db.Column(db.DateTime)
-    key_expires = db.Column(db.DateTime)
+    dateofbirth = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
