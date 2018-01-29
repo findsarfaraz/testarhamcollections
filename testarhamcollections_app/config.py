@@ -1,5 +1,7 @@
 import os
-basedir=os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
 class Config(object):
     """
     Common configurations
@@ -10,6 +12,7 @@ class Config(object):
     # Put any configurations here that are common across all environments
     SECRET_KEY = 'THIS IS BASIS SECRET KEY'
 
+
 class DevelopmentConfig(Config):
     """
     Development configurations
@@ -18,22 +21,24 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY = 'THIS IS DEVELOPMENT SECRET KEY'
     SQLALCHEMY_ECHO = True
-    SQLALCHEMY_DATABASE_URI ='mysql://root:welcome@123@localhost:3306/flasktestarham'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:welcome@123@localhost:3306/flasktestarham'
 
-    MAIL_SERVER='arhamcollections.com'
-    MAIL_PORT=465
-    MAIL_USERNAME='registration@arhamcollections.com'
+    MAIL_SERVER = 'arhamcollections.com'
+    MAIL_PORT = 465
+    MAIL_USERNAME = 'registration@arhamcollections.com'
     MAIL_PASSWORD = 'welcome@123'
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
 
+
 class DefaultConfig(Config):
 
-   # Statement for enabling the development environment
-   DEBUG = True
+    # Statement for enabling the development environment
+    DEBUG = True
 
-   # Secret key for signing cookies
-   SECRET_KEY = 'development key'
+    # Secret key for signing cookies
+    SECRET_KEY = 'development key'
+
 
 class ProductionConfig(Config):
     """
@@ -41,16 +46,18 @@ class ProductionConfig(Config):
     """
 
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI ='sqlite:///' + os.path.join(basedir, 'live.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'live.db')
+
 
 app_config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig
 }
 
+
 def get_config(MODE):
-    SWITCH={
-            'LOCAL':DevelopmentConfig,
-            'PRODUCTION':ProductionConfig
-            }
+    SWITCH = {
+        'LOCAL': DevelopmentConfig,
+        'PRODUCTION': ProductionConfig
+    }
     return SWITCH[MODE]

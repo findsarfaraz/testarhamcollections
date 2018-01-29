@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request
-from forms import SignupForm, LoginForm, ProfileForm
+from forms import SignupForm, LoginForm, ProfileForm, AddAddressForm, ChangePasswordForm, ForgotPasswordForm, PasswordResetForm
 from werkzeug.security import check_password_hash, generate_password_hash
-from models import User, Userroles, Userrolesmapping, Userprofile
+from models import User, Userroles, Userrolesmapping, Userprofile, Useraddress
 from ..extensions import db, login_manager
 
 from itsdangerous import URLSafeTimedSerializer
@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from flask_mail import Message
 import random
 import hashlib
-from sqlalchemy import exc
+from sqlalchemy import exc, and_
 import datetime
 
 
@@ -23,9 +23,7 @@ user_management = Blueprint('user_management', __name__, url_prefix="/", static_
 def login():
 
     form = LoginForm()
-    print "started"
     if form.validate_on_submit():
-        print "form valid"
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data + user.email_salt):
@@ -77,11 +75,6 @@ def signup():
                 db.session.rollback()
                 flash('ERROR! Email ({}) already exists.'.format(form.email.data), '')
     return render_template('user_management/signup.html', form=form)
-
-
-@user_management.route("forgotpassword", methods=['GET', 'POST'])
-def forgotpassword():
-    return render_template('user_management/forgotpassword.html')
 
 
 @user_management.route("email", methods=['GET', 'POST'])
@@ -160,8 +153,151 @@ def accountpage():
 @user_management.route("addresslist", methods=['GET'])
 @login_required
 def addresslist():
-    pass
+    useraddress = Useraddress.query.filter(Useraddress.user_id == current_user.id).filter(Useraddress.delete_flag == 0).all()
+
+    return render_template('user_management/addresslist.html', useraddress=useraddress)
 
 
+@user_management.route("addaddress", methods=['GET', 'POST'])
 def addaddress():
-    pass
+    form = AddAddressForm()
+    if form.validate_on_submit():
+        data = Useraddress(first_name=form.first_name.data, last_name=form.last_name.data, address1=form.address1.data, address2=form.address2.data, landmark=form.landmark.data, state=form.state.data, city=form.city.data, pincode=form.pincode.data, mobileno=form.mobileno.data, user_id=current_user.id)
+        db.session.add(data)
+        db.session.commit()
+        return render_template('user_management/addaddress.html', form=form)
+    return render_template('user_management/addaddress.html', form=form)
+
+
+@user_management.route("editaddress/<int:address_id>", methods=['GET', 'POST'])
+@login_required
+def editaddress(address_id=None):
+    useraddress = Useraddress.query.filter_by(address_id=address_id).first()
+
+    form = AddAddressForm(obj=useraddress)
+    form.populate_obj(useraddress)
+    if form.validate_on_submit():
+        useraddress.first_name = form.first_name.data
+        useraddress.last_name = form.last_name.data
+        useraddress.address1 = form.address1.data
+        useraddress.address2 = form.address2.data
+        useraddress.landmark = form.landmark.data
+        useraddress.state = form.state.data
+        useraddress.city = form.city.data
+        useraddress.pincode = form.pincode.data
+        useraddress.mobileno = form.mobileno.data
+        useraddress.default_flag = form.default_flag.data
+
+        db.session.add(useraddress)
+        db.session.commit()
+
+        if form.default_flag.data:
+            ua = Useraddress.query.filter(Useraddress.user_id == current_user.id).filter(Useraddress.address_id != useraddress.address_id).filter(Useraddress.default_flag == True).all()
+            if ua:
+                for address in ua:
+                    print address.first_name
+                    address.default_flag = False
+                    db.session.add(address)
+                    db.session.commit()
+
+        return redirect(url_for('user_management.addresslist'))
+    return render_template('user_management/editaddress.html', form=form, ua=useraddress)
+
+
+@user_management.route("deleteaddress/<int:address_id>", methods=['GET', 'POST'])
+@login_required
+def deleteaddress(address_id):
+    ua = Useraddress.query.filter(Useraddress.address_id == address_id).first()
+    ua.delete_flag = True
+    db.session.add(ua)
+    db.session.commit()
+    return redirect(url_for('user_management.addresslist'))
+
+    # return render_template('user_management/addresslist.html')
+
+
+@user_management.route("changepassword", methods=['GET', 'POST'])
+@login_required
+def changepassword():
+    form = ChangePasswordForm()
+    flash("test")
+    user = User.query.filter_by(id=current_user.id).first()
+
+    if form.validate_on_submit():
+        if check_password_hash(user.password, form.current_password.data + user.email_salt):
+            flash("Incorrect Old password")
+            if form.new_password.data == form.confirm_password.data:
+                password_hash = generate_password_hash(form.new_password.data + user.email_salt, 'sha256')
+                user.password = password_hash
+                db.session.add(user)
+                db.session.commit()
+                flash("Password updated successfully")
+    return render_template('user_management/changepassword.html', form=form)
+
+
+@user_management.route("wishlist", methods=['GET', 'POST'])
+def wishlist():
+    return render_template('user_management/wishlist.html')
+
+
+@user_management.route("forgotpassword", methods=['GET', 'POST'])
+def forgotpassword():
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if user:
+            send_password_reset_email(form.email.data)
+            flash("Password reset email sent, Please check your inbox")
+        else:
+            flash("email not registered with us")
+            return redirect(url_for('user_management.signup'))
+    return render_template('user_management/forgotpassword.html', form=form)
+
+
+def send_password_reset_email(user_email):
+    confirm_serializer = URLSafeTimedSerializer('myprecious')
+
+    confirm_url = url_for(
+        'user_management.confirm_reset_email',
+        token=confirm_serializer.dumps(user_email, salt='email-confirmation-salt'),
+        _external=True)
+
+    html = render_template(
+        'user_management/email_password_reset.html',
+        confirm_url=confirm_url)
+
+    msg = Message('Password Reset Arhamollections.com', sender='registration@arhamcollections.com', recipients=[user_email])
+    msg.html = html
+
+    mail.send(msg)
+
+
+@user_management.route("reset/<token>")
+def confirm_reset_email(token):
+    try:
+        confirm_serializer = URLSafeTimedSerializer('myprecious')
+        email = confirm_serializer.loads(token, salt='email-confirmation-salt', max_age=18000)
+    except:
+        flash('The confirmation link is invalid or has expired.', 'error')
+        return redirect(url_for('user_management.forgotpassword'))
+
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        form = PasswordResetForm()
+        if form.validate_on_submit():
+            if form.new_password.data==form.confirm_password.data:
+                password_hash=generate_password_hash(form.new_password.data+user.email_salt)
+                user.password =password_hash
+                db.session.add(user)
+                db.session.commit()
+                return redirect('user_management.login')
+        return render_template('user_management/passwordreset.html', form=form)
+    else:
+        flash("User not in registered.")
+        return redirect(url_for('user_management.signup'))
+    return render_template('user_management/passwordreset.html', form=form)
+
+
+

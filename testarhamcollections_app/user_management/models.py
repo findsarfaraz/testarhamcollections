@@ -58,6 +58,7 @@ class Useraddress(db.Model):
     pincode = db.Column(db.String(10))
     mobileno = db.Column(db.String(15))
     default_flag = db.Column(db.Boolean, default=False)
+    delete_flag = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 

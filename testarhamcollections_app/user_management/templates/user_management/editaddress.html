@@ -8,64 +8,64 @@
 			</span>
 		</div>
 	</div>
-	<form action="{{url_for('user_management.addaddress')}}" method="POST">{{ form.csrf_token }}
+	<form action="{{url_for('user_management.editaddress',address_id=ua.address_id)}}" method="POST">{{ form.csrf_token }}
 		<div class="row">
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="first_name" type="text" name="first_name">
+					<input id="first_name" type="text" name="first_name" value={{form.first_name.data}}>
 					<label for="first_name">First Name</label>
 				</div>
 			</div>
 			<div class="row">	
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="last_name" type="text" name="last_name" >
+					<input id="last_name" type="text" name="last_name" value={{form.last_name.data}}>
 					<label for="last_name">Last Name</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="address1" type="text" name="address1">
+					<input id="address1" type="text" name="address1" value={{form.address1.data}}>
 					<label for="address1">Address</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="address2" type="text" name="address2" >
+					<input id="address2" type="text" name="address2" value={{form.address2.data}}>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="landmark" type="text" name="landmark">
+					<input id="landmark" type="text" name="landmark" value={{form.landmark.data}}>
 					<label for="landmark">Land Mark</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="state" type="text" name="state">
+					<input id="state" type="text" name="state" value={{form.state.data}}>
 					<label for="state">State</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="city" type="text" name="city">
+					<input id="city" type="text" name="city" value={{form.city.data}}>
 					<label for="city">City</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="pincode" type="text" name="pincode">
+					<input id="pincode" type="text" name="pincode" value={{form.pincode.data}}>
 					<label for="pincode">Pincode</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="mobileno" type="text" name="mobileno">
+					<input id="mobileno" type="text" name="mobileno" value={{form.mobileno.data}}>
 					<label for="mobileno">Mobile No</label>
 				</div>
 			</div>
 			<div class="row">
-				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input type="checkbox" checked="checked" uid="default_flag" name="default_flag" />
+				<div class="col s12 m8 l6 offset-l3 m2">
+					<input type="checkbox" id="default_flag" name="default_flag" {% if form.default_flag.data==1 %}{{"checked"}}{% endif %}>
 		      		<label for="default_flag">Set Default</label>
 		      	</div>
       		</div>

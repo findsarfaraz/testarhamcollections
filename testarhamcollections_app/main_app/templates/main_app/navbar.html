@@ -41,9 +41,9 @@
 <div>
 <ul id="dropdown1" class="dropdown-content">
   <li><a href={{ url_for('user_management.edituserprofile') }}>Your Profile</a></li>
-  <li><a href="#!">Your addresses</a></li>
-   <li><a href="#!">Change Password</a></li>
-  <li><a href="#!">Wish list</a></li>
+  <li><a href={{ url_for('user_management.addresslist') }}>Your addresses</a></li>
+   <li><a href={{ url_for('user_management.changepassword') }}>Change Password</a></li>
+  <li><a href={{ url_for('user_management.wishlist') }}>Wish list</a></li>
   <li><a href="#!">Your Orders</a></li>
 </ul>
 </div>
