@@ -53,6 +53,7 @@ def signup():
         confirm_password = form.confirm_password.data
         if password != confirm_password:
             flash("ERROR! Passwords not matching.")
+            return render_template('user_management/signup.html', form=form)
         else:
             try:
                 salt = hashlib.sha1(str(random.random())).hexdigest()[:10]
@@ -74,6 +75,7 @@ def signup():
             except exc.IntegrityError:
                 db.session.rollback()
                 flash('ERROR! Email ({}) already exists.'.format(form.email.data), '')
+                return render_template('user_management/signup.html', form=form)
     return render_template('user_management/signup.html', form=form)
 
 
@@ -112,15 +114,15 @@ def confirm_email(token):
     user = User.query.filter_by(email=email).first()
 
     if user.is_active:
-        flash("Email is already confirmed")
+        flash("Email is already confirmed, please login")
+        return redirect(url_for('user_management.login'))
     else:
         user.is_active = True
         user.confirmed_on = datetime.datetime.utcnow()
         db.session.add(user)
         db.session.commit()
         flash("Thank you for confirming email")
-
-        return redirect(url_for('main_app.home'))
+        return redirect(url_for('user_management.login'))
     return redirect(url_for('user_management.login'))
 
 
@@ -154,7 +156,6 @@ def accountpage():
 @login_required
 def addresslist():
     useraddress = Useraddress.query.filter(Useraddress.user_id == current_user.id).filter(Useraddress.delete_flag == 0).all()
-
     return render_template('user_management/addresslist.html', useraddress=useraddress)
 
 
@@ -279,7 +280,7 @@ def confirm_reset_email(token):
         confirm_serializer = URLSafeTimedSerializer('myprecious')
         email = confirm_serializer.loads(token, salt='email-confirmation-salt', max_age=18000)
     except:
-        flash('The confirmation link is invalid or has expired.', 'error')
+        flash('The confirmation link is invalid or has expired.', 'Error')
         return redirect(url_for('user_management.forgotpassword'))
 
     user = User.query.filter_by(email=email).first()
@@ -287,9 +288,9 @@ def confirm_reset_email(token):
     if user:
         form = PasswordResetForm()
         if form.validate_on_submit():
-            if form.new_password.data==form.confirm_password.data:
-                password_hash=generate_password_hash(form.new_password.data+user.email_salt)
-                user.password =password_hash
+            if form.new_password.data == form.confirm_password.data:
+                password_hash = generate_password_hash(form.new_password.data + user.email_salt)
+                user.password = password_hash
                 db.session.add(user)
                 db.session.commit()
                 return redirect('user_management.login')
@@ -298,6 +299,3 @@ def confirm_reset_email(token):
         flash("User not in registered.")
         return redirect(url_for('user_management.signup'))
     return render_template('user_management/passwordreset.html', form=form)
-
-
-
