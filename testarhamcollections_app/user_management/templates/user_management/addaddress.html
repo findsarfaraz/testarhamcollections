@@ -76,6 +76,18 @@
 			</div>
 		</div>
 	</form>
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		    {% for message in messages %}
+				<div class="row">
+				<div class="chip  red lighten-5">
+					{{ message }}
+					<i class="close material-icons">close</i>
+				</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
 </div>
 	
 

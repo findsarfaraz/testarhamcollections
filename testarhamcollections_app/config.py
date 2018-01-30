@@ -30,6 +30,9 @@ class DevelopmentConfig(Config):
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
 
+    UPLOAD_FOLDER = '/home/sarfaraz/flaskenv/testarhamcollecions/images'
+    ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
 
 class DefaultConfig(Config):
 

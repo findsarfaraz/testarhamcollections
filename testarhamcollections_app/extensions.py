@@ -7,3 +7,6 @@ login_manager = LoginManager()
 
 from flask_mail import Mail
 mail = Mail()
+
+from flask_script import Manager
+from flask - migrate import Migrate, MigrateCommand

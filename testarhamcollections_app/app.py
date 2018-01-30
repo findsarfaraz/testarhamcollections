@@ -62,3 +62,6 @@ def configure_extensions(app):
     def load_user(user_id):
         print "LOGIN MANAGER EXECUTED"
         return User.query.get(int(user_id))
+
+
+
