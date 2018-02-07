@@ -76,5 +76,5 @@ class Userrolesmapping(db.Model):
     __tablename__ = 'userrolemapping'
 
     mapping_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, nullable=False)
-    role_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('userroles.role_id'), nullable=False)

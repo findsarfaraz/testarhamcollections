@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, url_for, redirect, flash, request
+from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app, session
 from forms import SignupForm, LoginForm, ProfileForm, AddAddressForm, ChangePasswordForm, ForgotPasswordForm, PasswordResetForm
 from werkzeug.security import check_password_hash, generate_password_hash
-from models import User, Userroles, Userrolesmapping, Userprofile, Useraddress
+from models import (User, Userroles, Userrolesmapping, Userprofile, Useraddress
+                    )
 from ..extensions import db, login_manager
 
 from itsdangerous import URLSafeTimedSerializer
@@ -13,21 +14,41 @@ import random
 import hashlib
 from sqlalchemy import exc, and_
 import datetime
+from flask_principal import identity_changed, AnonymousIdentity, Identity, Permission, RoleNeed, UserNeed
+from collections import namedtuple
+from flask_principal import identity_loaded
+
+
+admin_permission = Permission(RoleNeed('Admin'))
 
 
 user_management = Blueprint('user_management', __name__, url_prefix="/", static_folder='./static', static_url_path="main_app/static", template_folder='./templates')
 # from .extensions import db
 
 
+app = current_app
+
+AddressNeed = namedtuple('AddressNeed', ['action', 'address_id'])
+
+
+class AddressPermission(Permission):
+    """Extend Permission to take a post_id and action as arguments"""
+
+    def __init__(self, action, address_id=None):
+        need = AddressNeed(action, address_id)
+        # super(AddressPermission, self).__init__(need)
+        super(AddressPermission, self).__init__(need)
+
+
 @user_management.route("login", methods=['GET', 'POST'])
 def login():
-
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data + user.email_salt):
                 login_user(user)
+                identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
                 flash("User logged in")
                 return redirect(url_for('main_app.home'))
             else:
@@ -38,9 +59,15 @@ def login():
     return render_template('user_management/loginpage.html', form=form)
 
 
+@login_required
 @user_management.route("logout")
 def logout():
+
     logout_user()
+    for key in ('identity.name', 'identity.auth_type'):
+        session.pop(key, None)
+    # identity_changed.send(current_app._get_current_object(), identity=AnonymousIdentity())
+    identity_changed.send(current_app, identity=AnonymousIdentity())
     return redirect(url_for('main_app.home'))
 
 
@@ -69,7 +96,7 @@ def signup():
 
                 userprofile = Userprofile(user_id=data.id)
                 db.session.add(userprofile)
-                db.session.commit
+                db.session.commit()
 
                 send_confirmation_email(email)
             except exc.IntegrityError:
@@ -85,7 +112,7 @@ def email():
 
 
 def send_confirmation_email(user_email):
-    confirm_serializer = URLSafeTimedSerializer('myprecious')
+    confirm_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
     confirm_url = url_for(
         'user_management.confirm_email',
@@ -105,7 +132,7 @@ def send_confirmation_email(user_email):
 @user_management.route("confirm/<token>")
 def confirm_email(token):
     try:
-        confirm_serializer = URLSafeTimedSerializer('myprecious')
+        confirm_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
         email = confirm_serializer.loads(token, salt='email-confirmation-salt', max_age=84600)
     except:
         flash('The confirmation link is invalid or has expired.', 'error')
@@ -129,6 +156,7 @@ def confirm_email(token):
 @user_management.route("edituserprofile", methods=['GET', 'POST'])
 @login_required
 def edituserprofile():
+
     userprofile = Userprofile.query.filter_by(user_id=current_user.id).first()
     form = ProfileForm(obj=userprofile)
     form.populate_obj(userprofile)
@@ -173,6 +201,10 @@ def addaddress():
 @user_management.route("editaddress/<int:address_id>", methods=['GET', 'POST'])
 @login_required
 def editaddress(address_id=None):
+
+    permission = AddressPermission('get', unicode(address_id))
+    print "THIS IS PERMISSION %s" % permission.can()
+
     useraddress = Useraddress.query.filter_by(address_id=address_id).first()
 
     form = AddAddressForm(obj=useraddress)
@@ -221,7 +253,6 @@ def deleteaddress(address_id):
 @login_required
 def changepassword():
     form = ChangePasswordForm()
-    flash("test")
     user = User.query.filter_by(id=current_user.id).first()
 
     if form.validate_on_submit():
@@ -257,7 +288,7 @@ def forgotpassword():
 
 
 def send_password_reset_email(user_email):
-    confirm_serializer = URLSafeTimedSerializer('myprecious')
+    confirm_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
     confirm_url = url_for(
         'user_management.confirm_reset_email',
@@ -277,7 +308,7 @@ def send_password_reset_email(user_email):
 @user_management.route("reset/<token>")
 def confirm_reset_email(token):
     try:
-        confirm_serializer = URLSafeTimedSerializer('myprecious')
+        confirm_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
         email = confirm_serializer.loads(token, salt='email-confirmation-salt', max_age=18000)
     except:
         flash('The confirmation link is invalid or has expired.', 'Error')
@@ -299,3 +330,26 @@ def confirm_reset_email(token):
         flash("User not in registered.")
         return redirect(url_for('user_management.signup'))
     return render_template('user_management/passwordreset.html', form=form)
+
+
+@user_management.route("testprocedure", methods=['GET', 'POST'])
+def testprocedure():
+    y = ""
+    x = dir(db.engine)
+    for i in x:
+
+        y = y + "<h1>" + i + "</h1>"
+    # rl = db.session.execute('GET_USER_ROLE').fetchall()
+    # print rl
+    html = "<h1>" + y + "</h1>"
+
+    return html
+
+
+@user_management.route("testexecute", methods=['GET', 'POST'])
+def testexecute():
+    x = db.engine.execute("CALL GET_USER_ROLES;")
+    for i in x:
+        print i.role
+
+    return "<h1>this is true</h1>"
