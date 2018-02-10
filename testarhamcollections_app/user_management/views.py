@@ -19,15 +19,12 @@ from collections import namedtuple
 from flask_principal import identity_loaded
 
 
-admin_permission = Permission(RoleNeed('Admin'))
-
-
 user_management = Blueprint('user_management', __name__, url_prefix="/", static_folder='./static', static_url_path="main_app/static", template_folder='./templates')
 # from .extensions import db
 
 
 app = current_app
-
+admin_permission = Permission(RoleNeed('Admin'))
 AddressNeed = namedtuple('AddressNeed', ['action', 'address_id'])
 
 
@@ -347,9 +344,30 @@ def testprocedure():
 
 
 @user_management.route("testexecute", methods=['GET', 'POST'])
+@login_required
 def testexecute():
-    x = db.engine.execute("CALL GET_USER_ROLES;")
+    user_id = 1
+    parameter = 'set @user_id=' + str(current_user.id) + ";"
+    sql = 'CALL GET_USER_ROLES ({0});'.format(user_id)
+    x = db.engine.execute(sql)
+    print x.rowcount
+
+    # print help(db.engine.execute)
+
+    return "<h1>this is true</h1>"
+
+
+@user_management.route("testexecute1", methods=['GET', 'POST'])
+@login_required
+@admin_permission.require()
+def testexecute1():
+    user_id = 1
+    parameter = 'set @user_id=' + str(current_user.id) + ";"
+    sql = 'CALL GET_USER_ROLES (%s);'
+    x = db.engine.execute(sql, user_id)
     for i in x:
         print i.role
+
+    # print help(db.engine.execute)
 
     return "<h1>this is true</h1>"

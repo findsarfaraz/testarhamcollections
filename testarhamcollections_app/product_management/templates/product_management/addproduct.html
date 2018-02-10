@@ -1,0 +1,41 @@
+{%extends 'main_app/base.html' %}
+{% block content%}
+<div class="row">
+	<div class="row">
+		<div class="card-panel grey lighten-2 col s12 m8 l8 offset-l2 m2">
+			<span class="red-text"><h5>Add Product </h5>
+			</span>
+		</div>
+	</div>
+	<form action="{{url_for('product_management.addproduct',product_id=product_id)}}" method="POST">{{ form.csrf_token }}
+		<div class="row">
+			<div class="row">
+				<div class="input-field col s12 m8 l8 offset-l2 m2">
+					<input id="product_title" type="text" name="product_title" value={{form.product_title.data}}>
+					<label for="product_title">Product Title</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field col s12 m8 l8 offset-l2 m2">
+					<button type="submit" class="btn cyan waves-effect waves-light col s12">Proceed to step 2</button>
+				</div>
+			</div>
+		</div>
+	</form>
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		    {% for message in messages %}
+				<div class="row">
+				<div class="chip  red lighten-5">
+					{{ message }}
+					<i class="close material-icons">close</i>
+				</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+</div>
+	
+
+
+{% endblock%}

@@ -2,7 +2,6 @@ import os
 from flask import Flask
 from flask_login import current_user
 
-
 import config as Config
 from common import constants as COMMON_CONSTANTS
 from main_app.views import main_app as ma
@@ -11,7 +10,7 @@ from product_management.views import product_management as pm
 from extensions import db, mail, login_manager, principal
 
 from user_management.models import User, Userroles, Useraddress
-from flask_principal import identity_loaded, RoleNeed, UserNeed
+from flask_principal import identity_loaded, RoleNeed, UserNeed, Permission
 
 
 __all__ = ['create_app']
@@ -32,6 +31,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_app(app, config)
     configure_blueprints(app, blueprints)
     configure_extensions(app)
+    # admin_permission = Permission(RoleNeed('Admin'))
     return app
 
 
@@ -59,6 +59,7 @@ def configure_extensions(app):
     mail.init_app(app)
     principal.init_app(app)
     login_manager.init_app(app)
+    login_manager.login_view = "user_management.login"
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -71,8 +72,8 @@ def configure_extensions(app):
         if hasattr(current_user, 'id'):
             identity.provides.add(UserNeed(current_user.id))
 
-        role = Userroles.query.filter_by(role_id=1).all()
-
+        role = db.engine.execute('CALL GET_USER_ROLES (%s)', current_user.id)
+        # role = Userroles.query.filter_by(role_id=1).all()
         current_user.roles = role
 
         if hasattr(current_user, 'roles'):
