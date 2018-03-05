@@ -11,7 +11,7 @@
 		<div class="row">
 			<div class="row">
 				<div class="input-field col s12 m8 l8 offset-l2 m2">
-					<input id="product_title" type="text" name="product_title" value={{form.product_title.data}}>
+					<input id="product_title" type="text" name="product_title" value= {%if product_id==None%}{{""}}{% else %}'{{form.product_title.data}}'{% endif %}>
 					<label for="product_title">Product Title</label>
 				</div>
 			</div>

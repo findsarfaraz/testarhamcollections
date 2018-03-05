@@ -4,3 +4,7 @@ from wtforms import StringField, PasswordField, SelectField, DateField, BooleanF
 
 class AddProductForm(FlaskForm):
     product_title = StringField("Product Title")
+
+
+class FormTest(FlaskForm):
+    name = StringField("name")

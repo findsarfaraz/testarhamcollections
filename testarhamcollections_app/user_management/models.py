@@ -1,7 +1,7 @@
 
 from ..extensions import db
 import datetime
-from flask_login import UserMixin, login_manager
+from flask_login import UserMixin, login_manager, current_user
 
 
 class User(db.Model, UserMixin):
@@ -17,11 +17,21 @@ class User(db.Model, UserMixin):
     is_active = db.Column(db.Boolean, default=False)
     userprofiles = db.relationship("Userprofile", uselist=False, backref='user', lazy=True)
     useraddresses = db.relationship("Useraddress", backref="user", lazy=True)
+    product = db.relationship("ProductMaster", backref="user", lazy=True)
+    productimage = db.relationship("ProductImageMapping", backref="user", lazy=True)
     email_salt = db.Column(db.String(256), nullable=False)
     confirmed_on = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<User %r>' % (self.email)
+
+    def get_name(self):
+        up = Userprofile.query.filter_by(user_id=self.id).first()
+        if not up.first_name == None or not up.last_name == None:
+            name = (" ".join([up.first_name, up.last_name])).title()
+        else:
+            name = self.email
+        return name
 
     # def get_id(self):
     #     """Return the email address to satisfy Flask-Login's requirements."""

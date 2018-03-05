@@ -10,3 +10,9 @@ login_manager = LoginManager()
 
 from flask_mail import Mail
 mail = Mail()
+
+from flask_wtf.csrf import CSRFProtect
+csrf = CSRFProtect()
+
+from flask_celery import Celery
+celery = Celery()

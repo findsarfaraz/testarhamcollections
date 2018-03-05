@@ -10,7 +10,7 @@
 	     <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 	      <ul id="nav-mobile" class="right hide-on-med-and-down">
 	        {% if current_user.is_authenticated %}
-	        <li><a class="dropdown-button" href={{ url_for('user_management.accountpage') }} data-beloworigin="true" data-activates="dropdown1">{{current_user.email}}<i class="material-icons right">arrow_drop_down</i></a></li>
+	        <li><a class="dropdown-button" href={{ url_for('user_management.accountpage') }} data-beloworigin="true" data-activates="dropdown1">{{current_user.get_name()}}<i class="material-icons right">arrow_drop_down</i></a></li>
 	        <li><a href={{ url_for('user_management.logout') }}>Log Out</a></li>
 	        {% else %}
 	        <li><a href={{ url_for('user_management.login') }}>Login</a></li>

@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, current_app
 from flask_login import current_user
 
 import config as Config
@@ -7,13 +7,14 @@ from common import constants as COMMON_CONSTANTS
 from main_app.views import main_app as ma
 from user_management.views import user_management as um, AddressNeed
 from product_management.views import product_management as pm
-from extensions import db, mail, login_manager, principal
+from extensions import db, mail, login_manager, principal, csrf, celery
 
 from user_management.models import User, Userroles, Useraddress
 from flask_principal import identity_loaded, RoleNeed, UserNeed, Permission
-
+from celery import Celery
 
 __all__ = ['create_app']
+
 
 DEFAULT_BLUEPRINTS = [
     ma, um, pm
@@ -27,7 +28,6 @@ def create_app(config=None, app_name=None, blueprints=None):
         blueprints = DEFAULT_BLUEPRINTS
 
     app = Flask(app_name, instance_path=COMMON_CONSTANTS.INSTANCE_FOLDER_PATH, instance_relative_config=True)
-
     configure_app(app, config)
     configure_blueprints(app, blueprints)
     configure_extensions(app)
@@ -59,6 +59,8 @@ def configure_extensions(app):
     mail.init_app(app)
     principal.init_app(app)
     login_manager.init_app(app)
+    csrf.init_app(app)
+    celery.init_app(app)
     login_manager.login_view = "user_management.login"
 
     @login_manager.user_loader
@@ -73,7 +75,7 @@ def configure_extensions(app):
             identity.provides.add(UserNeed(current_user.id))
 
         role = db.engine.execute('CALL GET_USER_ROLES (%s)', current_user.id)
-        # role = Userroles.query.filter_by(role_id=1).all()
+        role = Userroles.query.filter_by(role_id=1).all()
         current_user.roles = role
 
         if hasattr(current_user, 'roles'):
@@ -90,3 +92,19 @@ def configure_extensions(app):
                 identity.provides.add(AddressNeed('get', unicode(add1.address_id)))
                 identity.provides.add(AddressNeed('update', unicode(add1.address_id)))
                 identity.provides.add(AddressNeed('delete', unicode(add1.address_id)))
+
+
+def make_celery(app):
+    celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
+                    broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with current_app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery

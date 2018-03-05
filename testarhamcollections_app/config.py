@@ -1,4 +1,8 @@
 import os
+from datetime import timedelta
+from celery.schedules import crontab
+from user_management.views import add_together
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -22,6 +26,15 @@ class DevelopmentConfig(Config):
     SECRET_KEY = 'THIS IS DEVELOPMENT SECRET KEY'
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = 'mysql://root:welcome@123@localhost:3306/flasktestarham'
+    # CELERY_IMPORTS = ('user_management.views.add_together', )
+    CELERY_RESULT_BACKEND = 'rpc://'
+    CELERY_BROKER_URL = 'amqp://rabbitmquser:rabbitmqpassword@localhost:5672/myvhost'
+    CELERYBEAT_SCHEDULE = {
+        'add-every-30-seconds': {
+            'task': 'testarhamcollections_app.user_management.views.run_add_together',
+            'schedule': timedelta(seconds=10),
+        },
+    }
 
     MAIL_SERVER = 'arhamcollections.com'
     MAIL_PORT = 465
