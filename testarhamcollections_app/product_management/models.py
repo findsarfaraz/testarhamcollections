@@ -4,26 +4,30 @@ from flask import Flask, jsonify
 
 
 #
-# class CategoryMaster(db.Model):
-#     __tablename__ = categorymaster
 
-#     category_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     category_name = db.Column(db.String(512), blank=False, Null=False)
-#     creation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow())
-#     updation_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow())
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     subcategory = db.relationship("SubCategory", backref="categorymaster", lazy=True)
+class MenuMaster(db.Model):
+    __tablename__ = MenuMaster
+    menu_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    Menu_Name = db.Column(db.String(256), Blank=False, Null=False)
+    is_active = db.Column(db.Boolean, default=True)
 
 
-# class SubCategory(db.Model):
-#     __tablename__ = subcategorymaster
+class SubMenuMaster(db.Model):
+    __tablename__ = SubMenuMaster
+    submenu_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    subcategory_name = db.Column(db.String(256), Blank=False, Null=False)
+    menu_id = db.Column(db.Integer, db.ForeignKey('MenuMaster.menu_id'), nullable=False)
 
-#     subcategory_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     subcategory_name = db.Column(db.String(512), blank=False, Null=False)
-#     category_id = db.Column(db.Integer, db.ForeignKey('categorymaster.category_id'), nullable=False)
-#     creation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow())
-#     updation_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow())
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class CategoryMaster(db.Model):
+    __tablename__ = categorymaster
+
+    category_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    category_name = db.Column(db.String(512), blank=False, Null=False)
+    creation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow())
+    updation_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    parent_category = db.Column(db.Integer)
 
 
 class ProductMaster(db.Model):

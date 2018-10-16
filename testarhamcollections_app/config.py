@@ -25,7 +25,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY = 'THIS IS DEVELOPMENT SECRET KEY'
     SQLALCHEMY_ECHO = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:welcome@123@localhost:3306/flasktestarham'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:welcome@123@localhost:3306/test_arham'
     # CELERY_IMPORTS = ('user_management.views.add_together', )
     CELERY_RESULT_BACKEND = 'rpc://'
     CELERY_BROKER_URL = 'amqp://rabbitmquser:rabbitmqpassword@localhost:5672/myvhost'

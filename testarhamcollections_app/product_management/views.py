@@ -100,6 +100,7 @@ def changevote(vote=None):
 @product_management.route('testajax', methods=['POST', 'GET'])
 def testajax():
     clicked = None
+    
     if request.method == "POST":
         clicked = request.get_json()
         clicked['clicked'] = "test successul"
