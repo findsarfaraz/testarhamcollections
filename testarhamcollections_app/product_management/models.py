@@ -6,24 +6,25 @@ from flask import Flask, jsonify
 #
 
 class MenuMaster(db.Model):
-    __tablename__ = MenuMaster
+    __tablename__ = 'menumaster'
     menu_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    Menu_Name = db.Column(db.String(256), Blank=False, Null=False)
+    menu_name = db.Column(db.String(256), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
 
 
 class SubMenuMaster(db.Model):
-    __tablename__ = SubMenuMaster
+    __tablename__ = 'submenumaster'
     submenu_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    subcategory_name = db.Column(db.String(256), Blank=False, Null=False)
-    menu_id = db.Column(db.Integer, db.ForeignKey('MenuMaster.menu_id'), nullable=False)
+    submenu_name = db.Column(db.String(256), nullable=False)
+    menu_id = db.Column(db.Integer, db.ForeignKey('menumaster.menu_id'), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
 
 
 class CategoryMaster(db.Model):
-    __tablename__ = categorymaster
+    __tablename__ = 'categorymaster'
 
     category_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    category_name = db.Column(db.String(512), blank=False, Null=False)
+    category_name = db.Column(db.String(512), nullable=False)
     creation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     updation_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

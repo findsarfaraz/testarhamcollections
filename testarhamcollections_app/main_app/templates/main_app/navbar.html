@@ -44,6 +44,10 @@
   <li><a href={{ url_for('user_management.addresslist') }}>Your addresses</a></li>
    <li><a href={{ url_for('user_management.changepassword') }}>Change Password</a></li>
   <li><a href={{ url_for('user_management.wishlist') }}>Wish list</a></li>
+  {%if current_user.userrole=='Admin'%}
+  <li><a href={{ url_for('product_management.addmenu') }}>Add Menu</a></li>
+   <li><a href={{ url_for('main_app.admin') }}>Admin</a></li>
+  {%endif%}
   <li><a href="#!">Your Orders</a></li>
 </ul>
 </div>

@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request, jsonify, session
-# from models import ProductMaster
+from models import ProductMaster, MenuMaster, SubMenuMaster
 from models import VoteTest
+from flask_login import login_user, logout_user, login_required, current_user
 
-from forms import AddProductForm, FormTest
+from forms import AddProductForm, FormTest, AddMenuForm, AddSubmenuForm
 from ..extensions import db
 from werkzeug import secure_filename
 import os
@@ -21,7 +22,6 @@ def addproduct(product_id=None):
             db.session.commit()
             return redirect(url_for('product_management.addproductimage', product_id=addproduct.product_id))
         return render_template("product_management/addproduct.html", form=form, product_id=product_id)
-
     else:
         productdata = ProductMaster.query.filter_by(product_id=product_id).first()
         form = AddProductForm(obj=productdata)
@@ -89,7 +89,6 @@ def voteexample():
 @product_management.route('changevote/<vote>', methods=['POST', 'GET'])
 def changevote(vote=None):
     vt1 = request.args.get('vote')
-    print "THIS IS VOTE {}".format(vt1)
     vt = VoteTest.query.filter_by(voteid=1).first()
     vt.votenumber = vt.votenumber + int(vote)
     db.session.add(vt)
@@ -100,12 +99,83 @@ def changevote(vote=None):
 @product_management.route('testajax', methods=['POST', 'GET'])
 def testajax():
     clicked = None
-    
+
     if request.method == "POST":
         clicked = request.get_json()
         clicked['clicked'] = "test successul"
         if clicked == None:
             clicked = "test"
-        print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX{}".format(clicked)
         return jsonify(data=clicked)
     return render_template("product_management/testajax.html")
+
+
+@product_management.route("addmenu", methods=['POST', 'GET'])
+@product_management.route("addmenu/<int:menu_id>", methods=['POST', 'GET'])
+def addmenu(menu_id=None):
+    if menu_id == None:
+        form = AddMenuForm()
+        if form.validate_on_submit():
+            addmenu = MenuMaster(menu_name=form.menu_name.data, is_active=form.is_active.data)
+            db.session.add(addmenu)
+            db.session.commit()
+            return redirect(url_for('main_app.admin'))
+        return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
+    else:
+        menudata = MenuMaster.query.filter_by(menu_id=menu_id).first()
+        form = AddMenuForm(obj=menudata)
+        form.populate_obj(menudata)
+        if form.validate_on_submit():
+            menudata.menu_name = form.menu_name.data
+            menudata.is_active = form.is_active.data
+            print("this is form is active data {}".format(form.is_active.data))
+            db.session.add(menudata)
+            db.session.commit()
+            return redirect(url_for('main_app.admin'))
+        return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
+
+
+@product_management.route("addsubmenu", methods=['POST', 'GET'])
+@product_management.route("addsubmenu/<int:submenu_id>", methods=['POST', 'GET'])
+def addsubmenu(submenu_id=None):
+    menulist = MenuMaster.query.all()
+    for i in menulist:
+        print(i)
+    if submenu_id == None:
+        form = AddSubmenuForm()
+        form.menu_id.choices = [(x.menu_id, x.menu_name) for x in MenuMaster.query.all()]
+        # print(dir(form.menu_id))
+        if form.validate_on_submit():
+            addsubmenu = SubMenuMaster(submenu_name=form.submenu_name.data, is_active=form.is_active.data, menu_id=form.menu_id.data)
+            db.session.add(addsubmenu)
+            db.session.commit()
+            # return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
+            return redirect(url_for('main_app.admin'))
+        return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
+        # return 'test'
+    else:
+        submenudata = SubMenuMaster.query.filter_by(submenu_id=submenu_id).first()
+        form = AddSubmenuForm(obj=submenudata)
+        form.menu_id.choices = [(x.menu_id, x.menu_name) for x in MenuMaster.query.all()]
+        form.populate_obj(submenudata)
+        if form.validate_on_submit():
+            submenudata.menu_name = form.submenu_name.data
+            submenudata.is_active = form.is_active.data
+            submenudata.menu_id = form.menu_id.data
+            db.session.add(submenudata)
+            db.session.commit()
+            return redirect(url_for('main_app.admin'))
+        return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
+
+
+@product_management.route("menulist", methods=['POST', 'GET'])
+def menulist():
+    try:
+        menulist = db.engine.execute('CALL GET_MENU_LIST')
+        print('THIS IS MENULIST COUNT {}'.format(menulist.rowcount))
+        if menulist.rowcount != 0:
+            return render_template('product_management/menulist.html', menulist=menulist)
+        else:
+            return redirect(url_for('product_management.addmenu', menu_id=None))
+    except:
+        print('EXCEPTION EXCEPTION EXCEPTION')
+        return redirect(url_for('product_management.addmenu', menu_id=None))

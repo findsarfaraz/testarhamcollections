@@ -1,10 +1,11 @@
 import os
-from flask import Flask, current_app
+from flask import Flask, current_app, render_template
 from flask_login import current_user
 
 import config as Config
 from common import constants as COMMON_CONSTANTS
 from main_app.views import main_app as ma
+from main_app.error_handling import page_not_found_404, page_not_found_403, page_not_found_500
 from user_management.views import user_management as um, AddressNeed
 from product_management.views import product_management as pm
 from extensions import db, mail, login_manager, principal, csrf, celery
@@ -32,6 +33,9 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_blueprints(app, blueprints)
     configure_extensions(app)
     # admin_permission = Permission(RoleNeed('Admin'))
+    app.register_error_handler(404, page_not_found_404)
+    app.register_error_handler(403, page_not_found_403)
+    app.register_error_handler(500, page_not_found_500)
     return app
 
 
@@ -75,8 +79,10 @@ def configure_extensions(app):
             identity.provides.add(UserNeed(current_user.id))
 
         role = db.engine.execute('CALL GET_USER_ROLES (%s)', current_user.id)
-        role = Userroles.query.filter_by(role_id=1).all()
+        # role = Userroles.query.filter_by(role_id=1).all()
         current_user.roles = role
+        for role in current_user.roles:
+            current_user.userrole = role.role
 
         if hasattr(current_user, 'roles'):
             for role in current_user.roles:

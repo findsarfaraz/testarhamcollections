@@ -79,3 +79,18 @@ def testpath():
 # def allowed_file(filename):
 #     return '.' in filename and \
 #            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# @main_app.errorhandler(403)
+# def page_not_found(e):
+#     return render_template('403.html'), 403
+
+
+# @main_app.errorhandler(410)
+# def page_not_found(e):
+#     return render_template('410.html'), 410
+
+
+@main_app.route("admin", methods=['GET', 'POST'])
+def admin():
+    return render_template('main_app/admin.html')

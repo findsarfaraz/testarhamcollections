@@ -1,0 +1,54 @@
+{%extends 'main_app/base.html' %}
+
+{% block content%}
+
+  <div class="row">
+    <div class="col s6 m3">
+      <div class="card grey lighten-3">
+        <div class="card-content">
+          <span class="card-title">Manage Menu</span>
+        </div>
+        <div class="card-action">
+          <p><a href={{ url_for('product_management.addmenu') }}>Add Menu</a></p>
+          <p><a href={{ url_for('product_management.addsubmenu') }}>Add Sub Menu</a></p>
+          <p><a href={{ url_for('product_management.menulist') }}>Menu List</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="col s6 m3">
+      <div class="card grey lighten-3">
+        <div class="card-content">
+          <span class="card-title">Manage User</span>
+        </div>
+        <div class="card-action">
+          <p><a href={{ url_for('product_management.addmenu') }}>Add Menu</a></p>
+          <p><a href="#">This is a link</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="col s6 m3">
+      <div class="card grey lighten-3">
+        <div class="card-content">
+          <span class="card-title">Manage Products</span>
+        </div>
+        <div class="card-action">
+          <p><a href="#">This is a link</a></p>
+          <p><a href="#">This is a link</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="col s6 m3">
+      <div class="card grey lighten-3">
+        <div class="card-content">
+          <span class="card-title">Manage Orders</span>
+        </div>
+        <div class="card-action">
+          <p><a href="#">This is a link</a></p>
+          <p><a href="#">This is a link</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+            
+
+{%endblock%}

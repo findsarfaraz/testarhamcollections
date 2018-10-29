@@ -7,7 +7,7 @@
 			</span>
 		</div>
 	</div>
-	<form action="{{url_for('user_management.edituserprofile')}}" method="POST">{{ form.csrf_token }}
+	<form action="{{url_for('user_management.edituserprofile')}}" method="POST">{{form.csrf_token}}
 		<div class="row">
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">

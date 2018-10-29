@@ -1,0 +1,72 @@
+{%extends 'main_app/base.html' %}
+{% block content%}
+<div class="col s12 m4 l3">
+	<div class="row">
+		<div class="row">
+			<div class="card-panel grey lighten-2 col s12 m6 l4">
+				<span class="red-text"><h5>Add Sub Menu</h5>
+				</span>
+			</div>
+		</div>
+		<form action="{{url_for('product_management.addsubmenu',submenu_id=submenu_id)}}" method="POST">{{ form.csrf_token }}
+			<div class="row">
+				<div class="row">
+					<div class="input-field col s12 m6 l4">
+						<input id="submenu_name" type="text" name="submenu_name" value= {%if submenu_id==None%}{{""}}{% else %}{{form.submenu_name.data}}{% endif %}>
+						<label for="submenu_name">Sub Menu</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s12 m6 l4">
+						<select id="menu_id" name="menu_id">
+						{%if submenu_id==None%}
+						<option value="" disabled selected>Select Menu</option>
+						{%endif%}
+						{% for val in menulist%}
+						<option value={{val.menu_id}} {%if submenu_id==None%}{""} {%else%}{"selected"}{%endif%}>{{val.menu_name}}</option>
+						{%endfor%}
+						</select>
+						<label>Menu</label>
+					</div>
+				</div>
+				<!-- {{form.menu_id}} -->
+				<div class="row">
+					<div class="switch">
+						<label>
+						Off
+						<input id="is_active" type="checkbox" name="is_active" {%if form.is_active.data ==True%}{{'checked=checked'}} {% endif %}/>
+						<span class="lever"></span>
+						On
+						</label>
+					</div>
+				</div>
+
+	      		<div class="row">
+					<div class="input-field col s12 m6 l4">
+						<button type="submit" class="btn cyan waves-effect waves-light col s12">Save</button>
+					</div>
+				</div>
+			</div>
+		</form>
+
+
+
+
+		<!-- {% with messages = get_flashed_messages() %}
+			{% if messages %}
+			    {% for message in messages %}
+					<div class="row">
+					<div class="chip  red lighten-5">
+						{{ message }}
+						<i class="close material-icons">close</i>
+					</div>
+					</div>
+				{% endfor %}
+			{% endif %}
+		{% endwith %} -->
+	</div>
+
+</div>
+
+{% endblock%}
+

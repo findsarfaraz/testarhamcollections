@@ -26,11 +26,15 @@ class User(db.Model, UserMixin):
         return '<User %r>' % (self.email)
 
     def get_name(self):
-        up = Userprofile.query.filter_by(user_id=self.id).first()
-        if not up.first_name == None or not up.last_name == None:
+        try:
+            up = Userprofile.query.filter_by(user_id=self.id).first()
             name = (" ".join([up.first_name, up.last_name])).title()
-        else:
+        except:
             name = self.email
+        # if not up.first_name == None and not up.last_name == None:
+         # name = (" ".join([up.first_name, up.last_name])).title()
+        # else:
+        #     name = self.email
         return name
 
     # def get_id(self):

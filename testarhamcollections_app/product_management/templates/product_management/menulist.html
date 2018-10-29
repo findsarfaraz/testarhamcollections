@@ -1,0 +1,52 @@
+{%extends 'main_app/base.html' %}
+{% block content%}
+<div class="col s12 m4 l3">
+	<div class="row">
+ 		<table class="highlight responsive">
+			<thead>
+			<tr>
+			<th>Menu Name</th>
+			<th>Menu Status</th>
+			<th>Submenu Name</th>
+			<th>Submenu Status</th>
+			</tr>
+			</thead>
+
+			<tbody>
+			{%for row in menulist%}
+			<tr>
+			<td>{{row.menu_name}}</td>
+			<td>
+				<div class="switch">
+				<label>
+				Off
+				<input type="checkbox" {% if row.menu_status==True %}{{'checked=checked'}}{%endif%}>
+				<span class="lever"></span>
+				On
+				</label>
+				</div>
+      		</td>
+			<td>{{row.submenu_name}}</td>
+			<td>
+				<div class="switch">
+				<label>
+				Off
+				<input type="checkbox" {% if row.submenu_status==True %}{{'checked=checked'}}{%endif%}>
+				<span class="lever"></span>
+				On
+				</label>
+				</div>
+			</td>
+			</tr>
+			{%endfor%}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+{% endblock%}
+  <div class="switch">
+    <label>
+      Off
+      <input type="checkbox">
+   
