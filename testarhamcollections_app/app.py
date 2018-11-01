@@ -13,6 +13,7 @@ from extensions import db, mail, login_manager, principal, csrf, celery
 from user_management.models import User, Userroles, Useraddress
 from flask_principal import identity_loaded, RoleNeed, UserNeed, Permission
 from celery import Celery
+from product_management.models import MenuMaster, SubMenuMaster
 
 __all__ = ['create_app']
 
@@ -32,6 +33,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_app(app, config)
     configure_blueprints(app, blueprints)
     configure_extensions(app)
+    configure_context(app)
     # admin_permission = Permission(RoleNeed('Admin'))
     app.register_error_handler(404, page_not_found_404)
     app.register_error_handler(403, page_not_found_403)
@@ -114,3 +116,13 @@ def make_celery(app):
                 return TaskBase.__call__(self, *args, **kwargs)
     celery.Task = ContextTask
     return celery
+
+
+def configure_context(app):
+    @app.context_processor
+    def makemenu():
+        menus = db.engine.execute('CALL GET_MENU')
+        submenu = db.engine.execute('CALL GET_SUBMENU')
+        x = menus.fetchall()
+        y = submenu.fetchall()
+        return dict(menus=x, submenu=y)

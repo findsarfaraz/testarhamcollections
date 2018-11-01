@@ -1,3 +1,5 @@
+
+
 <nav class="red darken-1">
     <div class="container">
 	    <div class="nav-wrapper red darken-1">
@@ -30,11 +32,15 @@
 	<div class="nav-wrapper">
 		<div class="container">
 		<ul class="left hide-on-med-and-down">
-			<li><a href="sass.html" class="red-text text-darken-1">Fashion</a></li>
+<!-- 			<li><a href="sass.html" class="red-text text-darken-1">Fashion</a></li>
 			<li><a href="badges.html" class="red-text text-darken-1">Jewellery</a></li>
-			<li><a href="badges.html" class="red-text text-darken-1">Footwear</a></li>
-			<li><a href="badges.html" class="red-text text-darken-1">Sales & Offer</a></li>
-			</ul>
+			<li><a href="badges.html" class="red-text text-darken-1">Footwear</a></li> -->
+			{%for row in menus%}
+			<li><a class="dropdown-button" href="badges.html" data-activates="menu{{row.menu_id}}"><span class="red-text text-darken-1">
+				{{row.menu_name}}
+			{% endfor %}	
+
+			</span></a></li>
 		</div>
 	</div>
  </nav>
@@ -51,5 +57,25 @@
   <li><a href="#!">Your Orders</a></li>
 </ul>
 </div>
+
+<div>
+
+
+{%for i in menus%}
+<ul id="menu{{i.menu_id}}" class="dropdown-content">
+		{%for j in submenu%}
+			{% if i.menu_id==j.menu_id %}
+			<li><a href={{ url_for('user_management.edituserprofile') }}>{{j.submenu_name}}</a></li>
+			{% endif %}
+		{% endfor %}
+
+</ul>
+ {% endfor %}
+
+		
+   
+
+
+
 
 

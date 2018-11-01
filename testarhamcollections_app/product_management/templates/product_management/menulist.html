@@ -15,7 +15,7 @@
 			<tbody>
 			{%for row in menulist%}
 			<tr>
-			<td>{{row.menu_name}}</td>
+			<td><a href="{{url_for('product_management.addmenu',menu_id=row.menu_id)}}">{{row.menu_name}}</a></td>
 			<td>
 				<div class="switch">
 				<label>
@@ -26,7 +26,7 @@
 				</label>
 				</div>
       		</td>
-			<td>{{row.submenu_name}}</td>
+			<td><a href="{{url_for('product_management.addsubmenu',submenu_id=row.submenu_id)}}">{{row.submenu_name}}</a></td>
 			<td>
 				<div class="switch">
 				<label>

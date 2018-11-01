@@ -5,6 +5,9 @@ main_app = Blueprint('main_app', __name__, url_prefix="/", static_folder='./stat
 # from .extensions import db
 from ..extensions import db
 from ..models import Testset
+from ..product_management.models import MenuMaster, SubMenuMaster
+# from models import VoteTest
+
 from ..user_management.models import User, Userprofile, Userroles
 from ..extensions import mail
 from flask_mail import Message
@@ -20,9 +23,20 @@ import os
 @main_app.route("/", methods=['GET', 'POST'])
 def home():
     # send_confirmation_email('admin@arhamcollections.com')
+    # menus = db.engine.execute('CALL GET_MENU')
+    # submenu = db.engine.execute('CALL GET_SUBMENU')
+    # x = menus.fetchall()
+    # y = submenu.fetchall()
     return render_template('main_app/index.html')
-    # ,lsts=lsts,form=form,form1=form1)
-    # return  "<h1>This is test</h1>"
+
+
+# @main_app.context_processor
+# def test():
+#     menus = db.engine.execute('CALL GET_MENU')
+#     submenu = db.engine.execute('CALL GET_SUBMENU')
+#     x = menus.fetchall()
+#     y = submenu.fetchall()
+#     return dict(menus=x, submenu=y)
 
 
 @main_app.route("faq", methods=['GET', 'POST'])
