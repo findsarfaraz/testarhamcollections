@@ -1,43 +1,109 @@
 {%extends 'main_app/base.html' %}
-{% block content %}
-<div class="row">
-	<div class="col s4">
+{% block content%}
+<div class="col s12 m4 l3">
+	<div class="row">
 		<div class="row">
-			<div class="row">
-				<div class="card-panel grey lighten-2">
-					<span class="red-text"><h5>Add Menu</h5>
-					</span>
-				</div>
-			</div>
-
-		<form action="{{url_for('product_management.addmenu',menu_id=menu_id)}}" method="POST">{{ form.csrf_token }}
-		<div class="row">
-			<div class="row">
-				<div class="input-field">
-					<input id="menu_name" type="text" name="menu_name" value= {%if menu_id==None%}{{""}}{% else %}'{{form.menu_name.data}}'{% endif %}>
-					<label for="menu_name">Menu</label>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="input-field">
-				<button type="submit" class="btn cyan waves-effect waves-light col s12">Save</button>
-				</div>
+			<div class="card-panel grey lighten-2 col s12 m6 l4">
+				<span class="red-text"><h5>Add Menu</h5>
+				</span>
 			</div>
 		</div>
+		<form  method="POST">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			<div class="row">
+				<div class="row">
+					<div class="input-field col s12 m6 l4">
+						<input id="menu_name" type="text" name="menu_name" 
+						value= {%if menu_id==None%}{{""}}{% else %}{{form.menu_name.data}}{% endif %}>
+						<label for="menu_name">Menu</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="switch">
+						<label>
+						Off
+						
+						<input id="is_active" type="checkbox" name="is_active">
+						
+						<span class="lever"></span>
+						On
+						</label>
+					</div>
+				</div>
+	      		<div class="row">
+					<div class="input-field col s12 m6 l4">
+						<button type="submit" id="savebutton" class="btn cyan waves-effect waves-light col s12">Save</button>
+					</div>
+				</div>
+			</div>
 		</form>
 
-		</div>
-	</div>
-	<div class="col s8">
-		<div class="row">
-			<div class="row">
-				<div class="card-panel grey lighten-2">
-					<span class="red-text"><h5>Menu List</h5>
-					</span>
-				</div>
+
+		<div class="row" id = "success">
+			<div class="chip  green lighten-5">
+				<p id="successmessage"></p>
+				<i class="close material-icons">close</i>
 			</div>
 		</div>
+		<div class="row" id="error">
+			<div class="chip  red lighten-5">
+				<p id="errormessage"></p>
+				<i class="close material-icons">close</i>
+			</div>
+		</div>
+
+
+		
 	</div>
+
 </div>
-{% endblock %}
+
+{% endblock%}
+
+<script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/jquery.min.js')}}"></script>
+<script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/materialize.min.js')}}"></script>
+
+<script>
+	$(document).ready(function(event){
+		$('#success').hide()
+		$('#error').hide()
+		var data;
+		var tempurl;
+		var url;
+		
+		tempurl = "{{ url_for('product_management.addmenuproc',menu_id='xxxxx')}}";
+		url=tempurl.replace('xxxxx','None');
+
+		$('form').on('submit',function(event){
+				
+
+
+				$.ajax({
+
+					type:"POST",
+					url:url,
+					data: $('form').serialize(),
+
+					success:function(data) {
+                		$("#successmessage").html(data.success);
+                		$('#success').show();
+
+											},
+					error: function(error)	{
+						$("#successmessage").html(data.error);
+						$('#error').show();
+											}
+
+					});
+			
+				event.preventdefault();
+
+			});
+
+
+		});
+
+		
+
+
+</script>

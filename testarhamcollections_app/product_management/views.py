@@ -7,6 +7,8 @@ from forms import AddProductForm, FormTest, AddMenuForm, AddSubmenuForm
 from ..extensions import db
 from werkzeug import secure_filename
 import os
+from flask_wtf.csrf import CsrfProtect
+
 product_management = Blueprint('product_management', __name__, url_prefix="/", static_folder='./static', static_url_path="main_app/static", template_folder='./templates')
 # from .extensions import db
 
@@ -87,19 +89,18 @@ def voteexample():
 
 
 @product_management.route('changevote/<vote>', methods=['POST', 'GET'])
-def changevote(vote=None):
+def changevote(vote):
     vt1 = request.args.get('vote')
     vt = VoteTest.query.filter_by(voteid=1).first()
     vt.votenumber = vt.votenumber + int(vote)
     db.session.add(vt)
     db.session.commit()
-    return jsonify(data={'vote': vt.votenumber})
+    return jsonify(data=vt.votenumber)
 
 
 @product_management.route('testajax', methods=['POST', 'GET'])
 def testajax():
     clicked = None
-
     if request.method == "POST":
         clicked = request.get_json()
         clicked['clicked'] = "test successul"
@@ -171,11 +172,34 @@ def addsubmenu(submenu_id=None):
 def menulist():
     try:
         menulist = db.engine.execute('CALL GET_MENU_LIST')
-        print('THIS IS MENULIST COUNT {}'.format(menulist.rowcount))
         if menulist.rowcount != 0:
             return render_template('product_management/menulist.html', menulist=menulist)
         else:
             return redirect(url_for('product_management.addmenu', menu_id=None))
     except:
-        print('EXCEPTION EXCEPTION EXCEPTION')
         return redirect(url_for('product_management.addmenu', menu_id=None))
+
+
+@product_management.route("addmenu1", methods=['POST', 'GET'])
+def addmenu1(menu_id=None):
+    form = AddMenuForm()
+    return render_template('product_management/addmenu1.html', menu_id=menu_id, form=form)
+
+
+@product_management.route("addmenuproc", methods=['POST', 'GET'])
+def addmenuproc(menu_id=None):
+    if request.method == "POST":
+        x = request.form.to_dict()
+        try:
+            x['is_active']
+            x['is_active'] = True
+        except KeyError:
+            x['is_active'] = False
+        try:
+            menu = MenuMaster(menu_name=x['menu_name'], is_active=x['is_active'])
+            db.session.add(menu)
+            db.session.commit()
+            return jsonify(success='Menu Added Successfully')
+        except:
+            error = 'Unable to add {}'.format(x['menu_name'])
+            return jsonify(error=error)
