@@ -1,52 +1,48 @@
 {%extends 'main_app/base.html' %}
 {% block content%}
-<div class="col s12 m4 l3">
-	<div class="row">
- 		<table class="highlight responsive">
-			<thead>
-			<tr>
+<div class="row">
+
+<table class="highlight responsive">
+	<thead>
+		<tr>
 			<th>Menu Name</th>
 			<th>Menu Status</th>
 			<th>Submenu Name</th>
 			<th>Submenu Status</th>
-			</tr>
-			</thead>
-
-			<tbody>
-			{%for row in menulist%}
-			<tr>
-			<td><a href="{{url_for('product_management.addmenu',menu_id=row.menu_id)}}">{{row.menu_name}}</a></td>
+		</tr>
+	</thead>
+	<tbody>	
+		{% for row in menulist %}
+		<tr>
+			<td><a href="{{ url_for('product_management.addmenu',menu_id=row.menu_id)}}">{{row.menu_name}}</a></td>
 			<td>
 				<div class="switch">
-				<label>
-				Off
-				<input type="checkbox" {% if row.menu_status==True %}{{'checked=checked'}}{%endif%}>
-				<span class="lever"></span>
-				On
-				</label>
-				</div>
-      		</td>
-			<td><a href="{{url_for('product_management.addsubmenu',submenu_id=row.submenu_id)}}">{{row.submenu_name}}</a></td>
-			<td>
-				<div class="switch">
-				<label>
-				Off
-				<input type="checkbox" {% if row.submenu_status==True %}{{'checked=checked'}}{%endif%}>
-				<span class="lever"></span>
-				On
-				</label>
+					<label>
+					Off
+					<input type="checkbox" {% if row.menu_status %}{{'checked=checked'}}{%endif%}>
+					<span class="lever"></span>
+					On
+					</label>
 				</div>
 			</td>
-			</tr>
-			{%endfor%}
-			</tbody>
-		</table>
-	</div>
+			<td><a href="" class="">{{row.submenu_name}}</a></td>
+			<td>
+				{%if row.submenu_name!=''%}
+				<div class="switch">
+					<label>
+					Off
+					<input type="checkbox" {% if row.submenu_status %}{{'checked=checked'}}{%endif%}>
+					<span class="lever"></span>
+					On
+					</label>
+				</div>
+				{%endif%}
+			</td>
+		</tr>
+		{%endfor%}
+	</tbody>
+</table>
 </div>
-
 {% endblock%}
-  <div class="switch">
-    <label>
-      Off
-      <input type="checkbox">
+
    

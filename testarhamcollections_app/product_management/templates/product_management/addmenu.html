@@ -1,6 +1,7 @@
 {%extends 'main_app/base.html' %}
 {% block content%}
-<div class="col s12 m4 l3">
+<div class="col s12 m12 l12">
+
 	<div class="row">
 		<div class="row">
 			<div class="card-panel grey lighten-2 col s12 m6 l4">
@@ -8,11 +9,13 @@
 				</span>
 			</div>
 		</div>
-		<form action="{{url_for('product_management.addmenu',menu_id=menu_id)}}" method="POST">{{ form.csrf_token }}
+		<form  method="POST">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 			<div class="row">
 				<div class="row">
 					<div class="input-field col s12 m6 l4">
-						<input id="menu_name" type="text" name="menu_name" value= {%if menu_id==None%}{{""}}{% else %}{{form.menu_name.data}}{% endif %}>
+						<input id="menu_name" type="text" name="menu_name" 
+						value= {%if menu_id==None%}{{""}}{% else %}{{form.menu_name.data}}{% endif %}>
 						<label for="menu_name">Menu</label>
 					</div>
 				</div>
@@ -20,38 +23,118 @@
 					<div class="switch">
 						<label>
 						Off
-						<input id="is_active" type="checkbox" name="is_active" {%if form.is_active.data ==True%}{{'checked=checked'}} {% endif %}/>
+						
+						<input id="is_active" type="checkbox" name="is_active" {%if form.is_active.data==True%}{{'checked=checked'}}{%endif%}>
+						
 						<span class="lever"></span>
 						On
 						</label>
 					</div>
 				</div>
-
 	      		<div class="row">
 					<div class="input-field col s12 m6 l4">
-						<button type="submit" class="btn cyan waves-effect waves-light col s12">Save</button>
+						<button type="submit" id="savebutton" class="btn cyan waves-effect waves-light col s12">Save</button>
 					</div>
 				</div>
 			</div>
+			
+
 		</form>
 
 
+	<div class="row" id = "success" >
+		<div class="chip green lighten-5" id="successmessage">
+			<i class="close material-icons">close</i>
+		</div>
+	</div>
+	<div class="row" id="error">
+		<div class="chip red lighten-5" id="errormessage">
+			<i class="close material-icons">close</i>
+		</div>
+	</div>
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	    <ul class=flashes>
+	    {% for message in messages %}
+	      <div class="chip red lighten-5" id="errormessage">{{message}}
+			<i class="close material-icons">close</i>
+		</div>
+	    {% endfor %}
+	    </ul>
+	  {% endif %}
+	{% endwith %}
 
-
-		{% with messages = get_flashed_messages() %}
-			{% if messages %}
-			    {% for message in messages %}
-					<div class="row">
-					<div class="chip  red lighten-5">
-						{{ message }}
-						<i class="close material-icons">close</i>
-					</div>
-					</div>
-				{% endfor %}
-			{% endif %}
-		{% endwith %}
+		
 	</div>
 
 </div>
 
 {% endblock%}
+{% block endjs %}
+<!-- <script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/jquery.min.js')}}"></script> -->
+
+{{super()}}
+<script>
+	$(document).ready(function(event){
+		
+		$('#success').hide()
+		$('#error').hide()
+		var data;
+		var tempurl;
+		var url;
+		var menu_id;
+		url = "{{ url_for('product_management.addmenu',menu_id=menu_id)}}";
+		
+		// url=tempurl.replace('999999999','None');
+				
+		// alert(tempurl);
+
+		$('form').on('submit',function(event){
+				
+
+
+				$.ajax({
+
+					type:"POST",
+					url:url,
+					data: $('form').serialize()
+					// success:function(data) {
+     //            		$("#successmessage").html(data.success);
+     //            		$('#success').removeClass('hide').addClass('show');
+						
+     //            		// alert('succcess');
+
+					// 						},
+					// error: function(error)	{
+					// 	$("#errormessage").html(data.error);
+					// 	$('#error').removeClass('hide').addClass('show')
+						
+						// alert('error');
+											
+
+					})
+					.done(function(data){
+						if(data.success){
+							$('#success').show();
+							$("#successmessage").text(data.success);
+						}
+
+						else if (data.error){
+							$('#error').show();
+							$("#errormessage").text(data.error);
+						}
+						
+					});
+			
+				event.preventDefault();
+
+			});
+
+
+		});
+
+		
+
+
+</script>
+{% endblock %}

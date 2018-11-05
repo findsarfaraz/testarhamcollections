@@ -110,29 +110,29 @@ def testajax():
     return render_template("product_management/testajax.html")
 
 
-@product_management.route("addmenu", methods=['POST', 'GET'])
-@product_management.route("addmenu/<int:menu_id>", methods=['POST', 'GET'])
-def addmenu(menu_id=None):
-    if menu_id == None:
-        form = AddMenuForm()
-        if form.validate_on_submit():
-            addmenu = MenuMaster(menu_name=form.menu_name.data, is_active=form.is_active.data)
-            db.session.add(addmenu)
-            db.session.commit()
-            return redirect(url_for('main_app.admin'))
-        return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
-    else:
-        menudata = MenuMaster.query.filter_by(menu_id=menu_id).first()
-        form = AddMenuForm(obj=menudata)
-        form.populate_obj(menudata)
-        if form.validate_on_submit():
-            menudata.menu_name = form.menu_name.data
-            menudata.is_active = form.is_active.data
-            print("this is form is active data {}".format(form.is_active.data))
-            db.session.add(menudata)
-            db.session.commit()
-            return redirect(url_for('main_app.admin'))
-        return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
+# @product_management.route("addmenu", methods=['POST', 'GET'])
+# @product_management.route("addmenu/<int:menu_id>", methods=['POST', 'GET'])
+# def addmenu(menu_id=None):
+#     if menu_id == None:
+#         form = AddMenuForm()
+#         if form.validate_on_submit():
+#             addmenu = MenuMaster(menu_name=form.menu_name.data, is_active=form.is_active.data)
+#             db.session.add(addmenu)
+#             db.session.commit()
+#             return redirect(url_for('main_app.admin'))
+#         return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
+#     else:
+        # menudata = MenuMaster.query.filter_by(menu_id=menu_id).first()
+        # form = AddMenuForm(obj=menudata)
+        # form.populate_obj(menudata)
+#         if form.validate_on_submit():
+#             menudata.menu_name = form.menu_name.data
+#             menudata.is_active = form.is_active.data
+#             print("this is form is active data {}".format(form.is_active.data))
+#             db.session.add(menudata)
+#             db.session.commit()
+#             return redirect(url_for('main_app.admin'))
+#         return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
 
 
 @product_management.route("addsubmenu", methods=['POST', 'GET'])
@@ -170,24 +170,29 @@ def addsubmenu(submenu_id=None):
 
 @product_management.route("menulist", methods=['POST', 'GET'])
 def menulist():
-    try:
-        menulist = db.engine.execute('CALL GET_MENU_LIST')
-        if menulist.rowcount != 0:
-            return render_template('product_management/menulist.html', menulist=menulist)
-        else:
-            return redirect(url_for('product_management.addmenu', menu_id=None))
-    except:
-        return redirect(url_for('product_management.addmenu', menu_id=None))
+    menulist = db.engine.execute('CALL GET_MENU_LIST')
+    print(dir(menulist))
+    x=menulist.fetchall()
+    print(x)
+    return render_template('product_management/menulist.html', menulist=x)
+
+    # try:
+    #     menulist = db.engine.execute('CALL GET_MENU_LIST')
+    #     rows=menulist.fetchall()
+    #     print('THIS IS COUNT OF ROW {} '.format(rows.__len__()))
+    #     if rows.__len__()>0:
+    #         print('test')
+    #         return render_template('product_management/menulist.html', menulist=rows)
+    #     else:
+    #         return redirect(url_for('product_management.addmenu', menu_id=None))
+    # except:
+    #     return redirect(url_for('product_management.addmenu', menu_id=None))
+    # return render_template('product_management/menulist.html', menulist=rows)
 
 
-@product_management.route("addmenu1", methods=['POST', 'GET'])
-def addmenu1(menu_id=None):
-    form = AddMenuForm()
-    return render_template('product_management/addmenu1.html', menu_id=menu_id, form=form)
-
-
-@product_management.route("addmenuproc", methods=['POST', 'GET'])
-def addmenuproc(menu_id=None):
+@product_management.route("addmenu", methods=['POST', 'GET'])
+@product_management.route("addmenu/<int:menu_id>", methods=['POST', 'GET'])
+def addmenu(menu_id=None):
     if request.method == "POST":
         x = request.form.to_dict()
         try:
@@ -195,11 +200,42 @@ def addmenuproc(menu_id=None):
             x['is_active'] = True
         except KeyError:
             x['is_active'] = False
-        try:
-            menu = MenuMaster(menu_name=x['menu_name'], is_active=x['is_active'])
-            db.session.add(menu)
-            db.session.commit()
-            return jsonify(success='Menu Added Successfully')
-        except:
-            error = 'Unable to add {}'.format(x['menu_name'])
-            return jsonify(error=error)
+        if menu_id == None:
+            try:
+                menu = MenuMaster(menu_name=x['menu_name'], is_active=x['is_active'])
+                db.session.add(menu)
+                db.session.commit()
+                return jsonify(success='Menu Added Successfully')
+            except:
+                error = 'Unable to add {}'.format(x['menu_name'])
+                return jsonify(error=error)
+        else:
+            try:
+                menu = MenuMaster.query.filter_by(menu_id=menu_id).first()
+                menu.menu_name = x['menu_name']
+                menu.is_active = x['is_active']
+                db.session.add(menu)
+                db.session.commit()
+                return jsonify(success='Menu Updated Successfully')
+            except:
+                error = 'This record not found {}'.format(x['menu_name'])
+                return jsonify(error=error)
+
+    else:
+        if menu_id == None:
+            form = AddMenuForm()
+            return render_template('product_management/addmenu.html', menu_id=menu_id, form=form)
+        else:
+            form = AddMenuForm()
+            try:
+                menudata = MenuMaster.query.filter_by(menu_id=menu_id).first()
+                form = AddMenuForm(obj=menudata)
+                form.populate_obj(menudata)
+                return render_template('product_management/addmenu.html', menu_id=menu_id, form=form)
+            except:
+                flash('Data not found')
+                return render_template('product_management/addmenu.html', menu_id=menu_id, form=form)
+
+               
+
+
