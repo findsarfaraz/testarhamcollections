@@ -3,38 +3,40 @@
 <div class="col s12 m8 l6">
 	<div class="row">
 		<div class="row">
-			<div class="card-panel grey lighten-2 col s12 m8 l6">
+			<div class="card-panel grey lighten-2 col s12 m12 l12">
 				<span class="red-text"><h5>Add Sub Menu</h5>
 				</span>
 			</div>
 		</div>
-		<form action="{{url_for('product_management.addsubmenu',submenu_id=submenu_id)}}" method="POST">{{ form.csrf_token }}
+		<form  method="POST">
 			<div class="row">
 				<div class="row">
-					<div class="input-field col s12 m6 l4">
+					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+					<div class="input-field col s12 m12 l12">
 						<input id="submenu_name" type="text" name="submenu_name" value= {%if submenu_id==None%}{{""}}{% else %}{{form.submenu_name.data}}{% endif %}>
 						<label for="submenu_name">Sub Menu</label>
 					</div>
 				</div>
 				<div class="row">
-					<div class="input-field col s12 m6 l4">
+					<div class="input-field col s12 m12 l12">
 						<select id="menu_id" name="menu_id">
 						{%if submenu_id==None%}
 						<option value="" disabled selected>Select Menu</option>
 						{%endif%}
-						{% for val in menulist%}
+
+						
+						{% for val in menulist %}
 						<option value={{val.menu_id}} {%if submenu_id==None%}{""} {%else%}{"selected"}{%endif%}>{{val.menu_name}}</option>
 						{%endfor%}
 						</select>
 						<label>Menu</label>
 					</div>
 				</div>
-				<!-- {{form.menu_id}} -->
 				<div class="row">
 					<div class="switch">
 						<label>
 						Off
-						<input id="is_active" type="checkbox" name="is_active" {%if form.is_active.data ==True%}{{'checked=checked'}} {% endif %}/>
+						<input id="is_active" type="checkbox" name="is_active"  {%if form.is_active.data==True%}{{'checked=checked'}}{%endif%}>
 						<span class="lever"></span>
 						On
 						</label>
@@ -42,31 +44,73 @@
 				</div>
 
 	      		<div class="row">
-					<div class="input-field col s12 m6 l4">
+					<div class="input-field col s12 m12 l12">
 						<button type="submit" class="btn cyan waves-effect waves-light col s12">Save</button>
 					</div>
 				</div>
 			</div>
 		</form>
+	</div>
 
-
-
-
-		<!-- {% with messages = get_flashed_messages() %}
-			{% if messages %}
-			    {% for message in messages %}
-					<div class="row">
-					<div class="chip  red lighten-5">
-						{{ message }}
-						<i class="close material-icons">close</i>
-					</div>
-					</div>
-				{% endfor %}
-			{% endif %}
-		{% endwith %} -->
+	<div class="row" id = "success" >
+		<div class="chip green lighten-5" id="successmessage">
+			<i class="close material-icons">close</i>
+		</div>
+	</div>
+	<div class="row" id="error">
+		<div class="chip red lighten-5" id="errormessage">
+			<i class="close material-icons">close</i>
+		</div>
 	</div>
 
 </div>
 
+
 {% endblock%}
 
+{% block endjs %}
+{{super()}}
+<script>
+
+
+$(document).ready(function(event){
+	$('#success').hide()
+	$('#error').hide()
+
+	var url;
+	url = "{{ url_for('product_management.addsubmenu',submenu_id=submenu_id)}}";
+	
+
+	$('form').on('submit',function(event){
+
+		$.ajax({
+			type:"POST",
+			url:url,
+			data:$('form').serialize(),
+
+
+		})
+		.done(function(data){
+						if(data.success){
+							$('#success').show();
+							$('#error').hide();
+							$("#successmessage").text(data.success);
+						}
+
+						else if (data.error){
+							$('#error').show();
+							$('#success').hide();
+							$("#errormessage").text(data.error);
+						}
+		});
+
+
+	event.preventDefault();
+	});
+
+
+});
+	
+</script>
+
+{% endblock %}

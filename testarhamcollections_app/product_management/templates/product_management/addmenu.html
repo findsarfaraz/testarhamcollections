@@ -1,7 +1,6 @@
 {%extends 'main_app/base.html' %}
 {% block content%}
 <div class="col s12 m12 l12">
-
 	<div class="row">
 		<div class="row">
 			<div class="card-panel grey lighten-2 col s12 m6 l4">
@@ -52,19 +51,6 @@
 			<i class="close material-icons">close</i>
 		</div>
 	</div>
-	{% with messages = get_flashed_messages() %}
-	  {% if messages %}
-	    <ul class=flashes>
-	    {% for message in messages %}
-	      <div class="chip red lighten-5" id="errormessage">{{message}}
-			<i class="close material-icons">close</i>
-		</div>
-	    {% endfor %}
-	    </ul>
-	  {% endif %}
-	{% endwith %}
-
-		
 	</div>
 
 </div>

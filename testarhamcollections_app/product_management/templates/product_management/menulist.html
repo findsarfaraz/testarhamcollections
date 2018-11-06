@@ -25,9 +25,14 @@
 					</label>
 				</div>
 			</td>
-			<td><a href="{{ url_for('product_management.addsubmenu',menu_id=row.submenu_id)}}" >{{row.submenu_name}}</a></td>
+			
+			<td>{%if row.submenu_name!=''%}
+				<a href="{{ url_for('product_management.addsubmenu',submenu_id=row.submenu_id)}}">{{row.submenu_name}}</a>
+				{%endif%}
+			</td>
+			
 			<td>
-				{%if row.submenu_name!=''%}
+			{%if row.submenu_name!=''%}
 				<div class="switch">
 					<label>
 					Off
@@ -36,7 +41,7 @@
 					On
 					</label>
 				</div>
-				{%endif%}
+			{%endif%}
 			</td>
 		</tr>
 		{%endfor%}

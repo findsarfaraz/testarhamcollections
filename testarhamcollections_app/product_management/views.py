@@ -122,9 +122,9 @@ def testajax():
 #             return redirect(url_for('main_app.admin'))
 #         return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
 #     else:
-        # menudata = MenuMaster.query.filter_by(menu_id=menu_id).first()
-        # form = AddMenuForm(obj=menudata)
-        # form.populate_obj(menudata)
+    # menudata = MenuMaster.query.filter_by(menu_id=menu_id).first()
+    # form = AddMenuForm(obj=menudata)
+    # form.populate_obj(menudata)
 #         if form.validate_on_submit():
 #             menudata.menu_name = form.menu_name.data
 #             menudata.is_active = form.is_active.data
@@ -135,44 +135,43 @@ def testajax():
 #         return render_template("product_management/addmenu.html", form=form, menu_id=menu_id)
 
 
-@product_management.route("addsubmenu", methods=['POST', 'GET'])
-@product_management.route("addsubmenu/<int:submenu_id>", methods=['POST', 'GET'])
-def addsubmenu(submenu_id=None):
-    menulist = MenuMaster.query.all()
-    for i in menulist:
-        print(i)
-    if submenu_id == None:
-        form = AddSubmenuForm()
-        form.menu_id.choices = [(x.menu_id, x.menu_name) for x in MenuMaster.query.all()]
-        # print(dir(form.menu_id))
-        if form.validate_on_submit():
-            addsubmenu = SubMenuMaster(submenu_name=form.submenu_name.data, is_active=form.is_active.data, menu_id=form.menu_id.data)
-            db.session.add(addsubmenu)
-            db.session.commit()
-            # return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
-            return redirect(url_for('main_app.admin'))
-        return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
-        # return 'test'
-    else:
-        submenudata = SubMenuMaster.query.filter_by(submenu_id=submenu_id).first()
-        form = AddSubmenuForm(obj=submenudata)
-        form.menu_id.choices = [(x.menu_id, x.menu_name) for x in MenuMaster.query.all()]
-        form.populate_obj(submenudata)
-        if form.validate_on_submit():
-            submenudata.menu_name = form.submenu_name.data
-            submenudata.is_active = form.is_active.data
-            submenudata.menu_id = form.menu_id.data
-            db.session.add(submenudata)
-            db.session.commit()
-            return redirect(url_for('main_app.admin'))
-        return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
+# @product_management.route("addsubmenu", methods=['POST', 'GET'])
+# @product_management.route("addsubmenu/<int:submenu_id>", methods=['POST', 'GET'])
+# def addsubmenu(submenu_id=None):
+#     menulist = MenuMaster.query.all()
+#     for i in menulist:
+#         print(i)
+#     if submenu_id == None:
+#         form = AddSubmenuForm()
+#         form.menu_id.choices = [(x.menu_id, x.menu_name) for x in MenuMaster.query.all()]
+#         # print(dir(form.menu_id))
+#         if form.validate_on_submit():
+#             addsubmenu = SubMenuMaster(submenu_name=form.submenu_name.data, is_active=form.is_active.data, menu_id=form.menu_id.data)
+#             db.session.add(addsubmenu)
+#             db.session.commit()
+#             # return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
+#             return redirect(url_for('main_app.admin'))
+#         return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
+#         # return 'test'
+#     else:
+#         submenudata = SubMenuMaster.query.filter_by(submenu_id=submenu_id).first()
+#         form = AddSubmenuForm(obj=submenudata)
+#         form.menu_id.choices = [(x.menu_id, x.menu_name) for x in MenuMaster.query.all()]
+#         form.populate_obj(submenudata)
+#         if form.validate_on_submit():
+#             submenudata.menu_name = form.submenu_name.data
+#             submenudata.is_active = form.is_active.data
+#             submenudata.menu_id = form.menu_id.data
+#             db.session.add(submenudata)
+#             db.session.commit()
+#             return redirect(url_for('main_app.admin'))
+#         return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
 
 
 @product_management.route("menulist", methods=['POST', 'GET'])
 def menulist():
     menulist = db.engine.execute('CALL GET_MENU_LIST')
-    print(dir(menulist))
-    x=menulist.fetchall()
+    x = menulist.fetchall()
     print(x)
     return render_template('product_management/menulist.html', menulist=x)
 
@@ -233,16 +232,49 @@ def addmenu(menu_id=None):
                 form.populate_obj(menudata)
                 return render_template('product_management/addmenu.html', menu_id=menu_id, form=form)
             except:
-                flash('Data not found')
-                return render_template('product_management/addmenu.html', menu_id=menu_id, form=form)
-@product_management.route('addsubmenu1',method=['POST','GET'])                
-def addsubmenu1(submenu_id=None):
+                return redirect(404)
+
+
+@product_management.route('addsubmenu', methods=['POST', 'GET'])
+@product_management.route("addsubmenu/<int:submenu_id>", methods=['POST', 'GET'])
+def addsubmenu(submenu_id=None):
+    form = AddSubmenuForm()
+    menulist = MenuMaster.query.all()
     if request.method == "POST":
-        x=request.form.to_dict()
-        print(x)
-    return return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
-    
-
-               
-
-
+        x = request.form.to_dict()
+        try:
+            x['is_active']
+            x['is_active'] = True
+        except KeyError:
+            x['is_active'] = False
+        if submenu_id == None:
+            try:
+                submenumaster = SubMenuMaster(submenu_name=x['submenu_name'], is_active=x['is_active'], menu_id=x['menu_id'])
+                db.session.add(submenumaster)
+                db.session.commit()
+                return jsonify(success='Submenu Added Successfully')
+            except:
+                return jsonify(error='Submenu Addition Failed')
+        else:
+            try:
+                submenudata = SubMenuMaster.query.filter_by(submenu_id=submenu_id).first()
+                submenudata.submenu_name = x['submenu_name']
+                submenudata.is_active = x['is_active']
+                submenudata.menu_id = x['menu_id']
+                db.session.add(submenudata)
+                db.session.commit()
+                return jsonify(success='Submenu Updated Successfully')
+            except:
+                return jsonify(error='Unable to fetch data')
+    else:
+        if submenu_id == None:
+            return render_template('product_management/addsubmenu.html', submenu_id=submenu_id, form=form, menulist=menulist)
+        else:
+            try:
+                submenudata = SubMenuMaster.query.filter_by(submenu_id=submenu_id).first()
+                form = AddSubmenuForm(obj=submenudata)
+                form.populate_obj(submenudata)
+                return render_template('product_management/addsubmenu.html', submenu_id=submenu_id, form=form, menulist=menulist)
+            except:
+                return redirect(404)
+                # return jsonify(error='Unable to fetch data')
