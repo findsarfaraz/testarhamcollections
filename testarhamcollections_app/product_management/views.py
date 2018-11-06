@@ -235,6 +235,13 @@ def addmenu(menu_id=None):
             except:
                 flash('Data not found')
                 return render_template('product_management/addmenu.html', menu_id=menu_id, form=form)
+@product_management.route('addsubmenu1',method=['POST','GET'])                
+def addsubmenu1(submenu_id=None):
+    if request.method == "POST":
+        x=request.form.to_dict()
+        print(x)
+    return return render_template("product_management/addsubmenu.html", form=form, submenu_id=submenu_id, menulist=menulist)
+    
 
                
 

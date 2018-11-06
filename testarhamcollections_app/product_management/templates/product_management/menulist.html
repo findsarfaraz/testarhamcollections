@@ -19,19 +19,19 @@
 				<div class="switch">
 					<label>
 					Off
-					<input type="checkbox" {% if row.menu_status %}{{'checked=checked'}}{%endif%}>
+					<input disabled type="checkbox" {% if row.menu_status %}{{'checked=checked'}}{%endif%}>
 					<span class="lever"></span>
 					On
 					</label>
 				</div>
 			</td>
-			<td><a href="" class="">{{row.submenu_name}}</a></td>
+			<td><a href="{{ url_for('product_management.addsubmenu',menu_id=row.submenu_id)}}" >{{row.submenu_name}}</a></td>
 			<td>
 				{%if row.submenu_name!=''%}
 				<div class="switch">
 					<label>
 					Off
-					<input type="checkbox" {% if row.submenu_status %}{{'checked=checked'}}{%endif%}>
+					<input disabled type="checkbox" {% if row.submenu_status %}{{'checked=checked'}}{%endif%}>
 					<span class="lever"></span>
 					On
 					</label>
