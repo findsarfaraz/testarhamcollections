@@ -8,67 +8,69 @@
 			</span>
 		</div>
 	</div>
-	<form action="{{url_for('user_management.addaddress')}}" method="POST">{{ form.csrf_token }}
+	<form  method="POST">
 		<div class="row">
 			<div class="row">
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="first_name" type="text" name="first_name">
+					<input id="first_name" type="text" name="first_name" value={%if address_id==None%}{{""}}{%else%}{{form.first_name.data}}{%endif%}>
 					<label for="first_name">First Name</label>
 				</div>
 			</div>
 			<div class="row">	
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="last_name" type="text" name="last_name" >
+					<input id="last_name" type="text" name="last_name" value={%if address_id==None%}{{""}}{%else%}{{form.last_name.data}}{%endif%} >
 					<label for="last_name">Last Name</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="address1" type="text" name="address1">
+					<input id="address1" type="text" name="address1" value={%if address_id==None%}{{""}}{%else%}{{form.address1.data}}{%endif%}>
 					<label for="address1">Address</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="address2" type="text" name="address2" >
+					<input id="address2" type="text" name="address2" value={%if address_id==None%}{{""}}{%else%}{{form.address2.data}}{%endif%}>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="landmark" type="text" name="landmark">
+					<input id="landmark" type="text" name="landmark" value={%if address_id==None%}{{""}}{%else%}{{form.landmark.data}}{%endif%}>
 					<label for="landmark">Land Mark</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="state" type="text" name="state">
+					<input id="state" type="text" name="state" value={%if address_id==None%}{{""}}{%else%}{{form.state.data}}{%endif%}>
 					<label for="state">State</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="city" type="text" name="city">
+					<input id="city" type="text" name="city" value={%if address_id==None%}{{""}}{%else%}{{form.city.data}}{%endif%}>
 					<label for="city">City</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="pincode" type="text" name="pincode">
+					<input id="pincode" type="text" name="pincode" value={%if address_id==None%}{{""}}{%else%}{{form.pincode.data}}{%endif%}>
 					<label for="pincode">Pincode</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="mobileno" type="text" name="mobileno">
+					<input id="mobileno" type="text" name="mobileno" value={%if address_id==None%}{{""}}{%else%}{{form.mobileno.data}}{%endif%}>
 					<label for="mobileno">Mobile No</label>
 				</div>
 			</div>
 			<div class="row">
-				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input type="checkbox" checked="checked" uid="default_flag" name="default_flag" />
+				<div class="col s12 m8 l6 offset-l3 m2">
+					<input type="checkbox"  id="default_flag" name="default_flag" {%if form.default_flag.data==True%}{{'checked=checked'}}{%endif%}/>
 		      		<label for="default_flag">Set Default</label>
 		      	</div>
       		</div>
+
       		<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
 					<button type="submit" class="btn cyan waves-effect waves-light col s12">Save</button>
@@ -76,19 +78,70 @@
 			</div>
 		</div>
 	</form>
-	{% with messages = get_flashed_messages() %}
-		{% if messages %}
-		    {% for message in messages %}
-				<div class="row">
-				<div class="chip  red lighten-5">
-					{{ message }}
-					<i class="close material-icons">close</i>
-				</div>
-				</div>
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
+	<div class="col s12 m8 l6 offset-l3 m2">
+		<div class="row" id = "success" >
+			<div class="chip green lighten-5" id="successmessage">
+				<i class="close material-icons">close</i>
+			</div>
+		</div>
+		<div class="row" id="error">
+			<div class="chip red lighten-5" id="errormessage">
+				<i class="close material-icons">close</i>
+			</div>
+		</div>
+	</div>	
+
+
 </div>
 	
 
 {% endblock %}
+
+
+
+{% block endjs%}
+{{super()}}
+<script>
+
+
+$(document).ready(function(event){
+	$('#success').hide()
+	$('#error').hide()
+
+	var url;
+	url = "{{ url_for('user_management.addaddress',address_id=address_id)}}";
+	
+
+	$('form').on('submit',function(event){
+
+		$.ajax({
+			type:"POST",
+			url:url,
+			data:$('form').serialize(),
+
+
+		})
+		.done(function(data){
+						if(data.success){
+							$('#success').show();
+							$('#error').hide();
+							$("#successmessage").text(data.success);
+						}
+
+						else if (data.error){
+							$('#error').show();
+							$('#success').hide();
+							$("#errormessage").text(data.error);
+						}
+		});
+
+
+	event.preventDefault();
+	});
+
+
+});
+
+</script>
+
+{% endblock%}

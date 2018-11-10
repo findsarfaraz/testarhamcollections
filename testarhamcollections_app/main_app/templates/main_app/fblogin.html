@@ -1,26 +1,5 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Document</title>
-	 <link href="{{ url_for('main_app.static',filename='css/materialize.min.css') }}" rel="stylesheet">
-	 <link href="{{ url_for('main_app.static',filename='css/fontawesome.min.css') }}" rel="stylesheet">
-	 <link href="{{ url_for('main_app.static',filename='css/custom.css') }}" rel="stylesheet">
-	 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-		
-</head>
-<body>
-{%block startjs%}
-<script type=text/javascript>
-  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-
-</script>
-
-
-{% endblock %}
+{%extends 'main_app/blankbase.html' %}
+{% block content%}
 <script>
   // This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
@@ -97,95 +76,17 @@
   }
 </script>
 
-<!--
-  Below we include the Login Button social plugin. This button uses
-  the JavaScript SDK to present a graphical Login button that triggers
-  the FB.login() function when clicked.
--->
-
-
-
-
-<main>
 <div class="row">
-
-    {%include 'main_app/navbar.html'%}
-
-    
-		
-</div>
-
-<div class="container">
-    {% block content%}
-    <div class="row">
-<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+	<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
 </fb:login-button>
-
-    {% endblock %}
-
-</div>
-</main>
-<div>
-	{%include 'main_app/footer.html'%}
 </div>
 
-{%block endjs%}
-
-<script type="text/javascript" src="{{ url_for('main_app.static',filename='js/jquery.min.js')}}"></script>
-<script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/materialize.min.js')}}"></script>
-<script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/fontawesome-all.js')}}"></script>
-<script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/ajax_csrf.js')}}"></script>
-
-
-<script>$(".button-collapse").sideNav();</script>
+{% endblock %}
 
 
 
 
 
-<!-- <script>
-var $datepicker = $('#dateofbirth');
-$datepicker.datepicker();
-$datepicker.datepicker('setDate', "01/01/2016");
-</script> -->
-<script>
-  $('.datepicker').pickadate({
-    format: 'dd/mm/yyyy',
-    selectMonths: true, // Creates a dropdown to control month
-    selectYears: 100, // Creates a dropdown of 15 years to control year,
-    today: 'Today',
-    clear: 'Clear',
-    close: 'Ok',
-    closeOnSelect: false // Close upon selecting a date,
-  });
-
-</script> 
-
-<script>
-  $('.dropdown-button').dropdown({
-
-      inDuration: 300,
-      outDuration: 225,
-      constrainWidth: true, // Does not change width of dropdown to that of the activator
-      hover: true, // Activate on hover
-      gutter: 0, // Spacing from edge
-      belowOrigin: true, // Displays dropdown below the button
-      alignment: 'left', // Displays dropdown with edge aligned to the left of button
-      stopPropagation: false // Stops event propagation
-
-    }
-  );
-</script>	
-<script>
 
 
-    $('select').material_select();
 
-
-</script>
-
- {%endblock%}
-
-
-</body>
-</html>

@@ -108,3 +108,8 @@ def testpath():
 @main_app.route("admin", methods=['GET', 'POST'])
 def admin():
     return render_template('main_app/admin.html')
+
+
+@main_app.route("fblogin",methods=['GET','POST'])
+def fblogin():
+    return render_template('main_app/fblogin.html')

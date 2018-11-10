@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app, session,abort
+from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app, session,abort,jsonify
 from forms import SignupForm, LoginForm, ProfileForm, AddAddressForm, ChangePasswordForm, ForgotPasswordForm, PasswordResetForm
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import (User, Userroles, Userrolesmapping, Userprofile, Useraddress
@@ -9,10 +9,11 @@ from itsdangerous import URLSafeTimedSerializer
 from ..extensions import mail
 from flask_login import login_user, logout_user, login_required, current_user
 
+
 from flask_mail import Message
 import random
 import hashlib
-from sqlalchemy import exc, and_
+from sqlalchemy import exc, and_, or_
 import datetime
 from flask_principal import identity_changed, AnonymousIdentity, Identity, Permission, RoleNeed, UserNeed
 from collections import namedtuple
@@ -46,20 +47,22 @@ class AddressPermission(Permission):
 @user_management.route("login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+    if request.method=="POST":
+        x=request.form.to_dict()
+        # print('THIS IS IS A USER {} '.format(x['email']))
+        user = User.query.filter_by(email=x['email']).first()
+        
         if user:
-            if check_password_hash(user.password, form.password.data + user.email_salt):
+            if check_password_hash(user.password, x['password'] + user.email_salt):
                 login_user(user)
                 identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
-                flash("User logged in")
-                return redirect(url_for('main_app.home'))
+                return jsonify(success='logged in',redirect='/')
             else:
-                flash("password not match")
+                return jsonify(error='Incorrect password')
         else:
-            flash("User does not exists")
-
-    return render_template('user_management/loginpage.html', form=form)
+            return jsonify(error='Username not registered')
+    else:
+        return render_template('user_management/loginpage.html', form=form)
 
 
 @login_required
@@ -187,57 +190,83 @@ def addresslist():
     return render_template('user_management/addresslist.html', useraddress=useraddress)
 
 
-@user_management.route("addaddress", methods=['GET', 'POST'])
-def addaddress():
-    form = AddAddressForm()
-    if form.validate_on_submit():
-        data = Useraddress(first_name=form.first_name.data, last_name=form.last_name.data, address1=form.address1.data, address2=form.address2.data, landmark=form.landmark.data, state=form.state.data, city=form.city.data, pincode=form.pincode.data, mobileno=form.mobileno.data, user_id=current_user.id)
-        db.session.add(data)
-        db.session.commit()
-        return render_template('user_management/addaddress.html', form=form)
-    return render_template('user_management/addaddress.html', form=form)
-
-
-@user_management.route("editaddress/<int:address_id>", methods=['GET', 'POST'])
+@user_management.route('addaddress', methods=['GET', 'POST'])
+@user_management.route("addaddress/<int:address_id>", methods=['GET', 'POST'])
 @login_required
+def addaddress(address_id=None):
+    form = AddAddressForm()
+    if request.method=='POST':
+        x=request.form.to_dict()
+        try:
+            x['default_flag']
+            x['default_flag']=True
 
-def editaddress(address_id=None):
+        except:
+            x['default_flag']=False
 
-    permission = AddressPermission('get', unicode(address_id))
-    print ("This is permission {}".format(permission.can()))
-
-    useraddress = Useraddress.query.filter_by(address_id=address_id).first()
-    if permission.can():
-
-        form = AddAddressForm(obj=useraddress)
-        form.populate_obj(useraddress)
-        if form.validate_on_submit():
-            useraddress.first_name = form.first_name.data
-            useraddress.last_name = form.last_name.data
-            useraddress.address1 = form.address1.data
-            useraddress.address2 = form.address2.data
-            useraddress.landmark = form.landmark.data
-            useraddress.state = form.state.data
-            useraddress.city = form.city.data
-            useraddress.pincode = form.pincode.data
-            useraddress.mobileno = form.mobileno.data
-            useraddress.default_flag = form.default_flag.data
-
-            db.session.add(useraddress)
-            db.session.commit()
-
-            if form.default_flag.data:
-                ua = Useraddress.query.filter(Useraddress.user_id == current_user.id).filter(Useraddress.address_id != useraddress.address_id).filter(Useraddress.default_flag == True).all()
-                if ua:
-                    for address in ua:
-                        address.default_flag = False
-                        db.session.add(address)
+        if address_id==None:
+            try:
+                data = Useraddress(first_name=x['first_name'], last_name=x['last_name'], address1=x['address1'], address2=x['address2'], landmark=x['landmark'], state=x['state'], city=x['city'], pincode=x['pincode'], mobileno=x['mobileno'], default_flag=x['default_flag'],user_id=current_user.id)
+                db.session.add(data)
+                db.session.commit()
+                if  x['default_flag']==True:
+                    try:
+                        defaultadddata=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id.address_id !=data.address_id).filter(Useraddress.default_flag==True).first()
+                        defaultadddata.default_flag=False
                         db.session.commit()
-
-            return redirect(url_for('user_management.addresslist'))
-        return render_template('user_management/editaddress.html', form=form, ua=useraddress)
+                    except:
+                        db.session.rollback()
+                        return jsonify(error="You don't have any default adddress" )
+                        # defaultadddata1=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id.address_id ==data.address_id).filter(Useraddress.default_flag==True).first()
+                        # defaultadddata1.default_flag=True
+                        # db.session.commit()
+                return jsonify(success='Address Added Successfully')
+            except:
+                db.session.rollback()
+                return jsonify(error='Error in adding Address')
+        else:
+            try:
+               
+                data=Useraddress.query.filter(db.and_(address_id ==address_id, Useraddress.user_id==current_user.id)).first()
+                data.first_name=x['first_name']
+                data.last_name=x['last_name']
+                data.address1=x['address1']
+                data.address2=x['address2']
+                data.landmark=x['landmark']
+                data.state=x['state']
+                data.city=x['city']
+                data.pincode=x['pincode']
+                data.mobileno=x['mobileno']
+                data.default_flag=x['default_flag']
+                data.user_id=current_user.id
+                db.session.add(data)
+                db.session.commit()
+                if  x['default_flag']==True:
+                    try:
+                        defaultadddata=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id!=address_id).filter(Useraddress.default_flag==True).first()
+                        defaultadddata.default_flag=False
+                        db.session.commit()
+                        # defaultadddata1=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id==address_id).first()
+                        # defaultadddata1.default_flag=True
+                        # db.session.commit()
+                    except:
+                        print('THIS IS CURRENT {} WITH ADDRESS_ID {}'.format(address_id,current_user.id))
+                        
+                return jsonify(success='Address Updated Successfully')
+            except:
+                return jsonify(error='Address not found')
     else:
-        return abort(403)
+        if address_id==None:
+            return render_template('user_management/addaddress.html', form=form,address_id=address_id)
+        else:
+            try:
+                data=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id==address_id).first()
+                form = AddAddressForm(obj=data)
+                form.populate_obj(data)
+                return render_template('user_management/addaddress.html', form=form,address_id=address_id)
+            except:
+                return redirect(404)
+    return render_template('user_management/addaddress.html', form=form)
 
 
 @user_management.route("deleteaddress/<int:address_id>", methods=['GET', 'POST'])
@@ -257,16 +286,19 @@ def deleteaddress(address_id):
 def changepassword():
     form = ChangePasswordForm()
     user = User.query.filter_by(id=current_user.id).first()
-
-    if form.validate_on_submit():
-        if check_password_hash(user.password, form.current_password.data + user.email_salt):
-            flash("Incorrect Old password")
-            if form.new_password.data == form.confirm_password.data:
-                password_hash = generate_password_hash(form.new_password.data + user.email_salt, 'sha256')
+    if request.method=='POST':
+        x=request.form.to_dict()
+        if check_password_hash(user.password, x['current_password'] + user.email_salt):
+            if x['new_password'] ==x['confirm_password']:
+                password_hash = generate_password_hash(x['new_password'] + user.email_salt, 'sha256')
                 user.password = password_hash
                 db.session.add(user)
                 db.session.commit()
-                flash("Password updated successfully")
+                return jsonify(success='Password Changed Successfully')
+            else:
+                return jsonify(error='New Password is not matching with Confirm Password')
+        else:
+            return jsonify(error='Inccorrect password')
     return render_template('user_management/changepassword.html', form=form)
 
 
@@ -398,3 +430,17 @@ def testcelery():
     add_together.delay(x, y)
  
     return "rhis ran "
+
+
+
+
+@user_management.route("addresstest/<int:address_id>", methods=['GET', 'POST'])
+@login_required
+def addresstest(address_id=None):
+    x=Useraddress.query.filter(db.and_(address_id ==address_id, Useraddress.user_id==current_user.id)).first()
+    print('THIS IS X {}'.format(x))
+    # db.session.commit()
+    # Useraddress.query.filter(address_id = address_id,user_id=current_user.id).update(dict(default_flag=True))
+    # db.session.commit()
+    return jsonify(data='Success')
+
