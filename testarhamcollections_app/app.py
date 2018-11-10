@@ -8,11 +8,12 @@ from main_app.views import main_app as ma
 from main_app.error_handling import page_not_found_404, page_not_found_403, page_not_found_500
 from user_management.views import user_management as um, AddressNeed
 from product_management.views import product_management as pm
-from extensions import db, mail, login_manager, principal, csrf, celery
+from extensions import db, mail, login_manager, principal, csrf
+# , celery
 
 from user_management.models import User, Userroles, Useraddress
 from flask_principal import identity_loaded, RoleNeed, UserNeed, Permission
-from celery import Celery
+# from celery import Celery
 from product_management.models import MenuMaster, SubMenuMaster
 
 __all__ = ['create_app']
@@ -66,7 +67,7 @@ def configure_extensions(app):
     principal.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
-    celery.init_app(app)
+    # celery.init_app(app)
     login_manager.login_view = "user_management.login"
 
     @login_manager.user_loader
@@ -102,20 +103,20 @@ def configure_extensions(app):
                 identity.provides.add(AddressNeed('delete', unicode(add1.address_id)))
 
 
-def make_celery(app):
-    celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
-                    broker=app.config['CELERY_BROKER_URL'])
-    celery.conf.update(app.config)
-    TaskBase = celery.Task
+# def make_celery(app):
+#     celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
+#                     broker=app.config['CELERY_BROKER_URL'])
+#     celery.conf.update(app.config)
+#     TaskBase = celery.Task
 
-    class ContextTask(TaskBase):
-        abstract = True
+#     class ContextTask(TaskBase):
+#         abstract = True
 
-        def __call__(self, *args, **kwargs):
-            with current_app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-    celery.Task = ContextTask
-    return celery
+#         def __call__(self, *args, **kwargs):
+#             with current_app.app_context():
+#                 return TaskBase.__call__(self, *args, **kwargs)
+#     celery.Task = ContextTask
+#     return celery
 
 
 def configure_context(app):

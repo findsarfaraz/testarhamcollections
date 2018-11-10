@@ -18,9 +18,9 @@ import datetime
 from flask_principal import identity_changed, AnonymousIdentity, Identity, Permission, RoleNeed, UserNeed
 from collections import namedtuple
 from flask_principal import identity_loaded
-from ..extensions import celery
-from celery.decorators import periodic_task
-from celery.task.schedules import crontab
+# from ..extensions import celery
+# from celery.decorators import periodic_task
+# from celery.task.schedules import crontab
 import random 
 
 from datetime import timedelta
@@ -409,27 +409,27 @@ def testexecute1():
     return "<h1>this is true</h1>"
 
 
-@celery.task()
-def add_together(a, b):
-    y=datetime.datetime.now()
-    x="ran at {}: sum of {} & {} is {}".format(y,a,b,a+b)
-    return x
+# @celery.task()
+# def add_together(a, b):
+#     y=datetime.datetime.now()
+#     x="ran at {}: sum of {} & {} is {}".format(y,a,b,a+b)
+#     return x
 
 # @periodic_task(run_every=crontab(minute='*/1'))
-@celery.task()
-def run_add_together():
-    x=random.randint(10,1000)
-    y=random.randint(10,1000)
-    m=add_together(x,y)
-    return m
+# @celery.task()
+# def run_add_together():
+#     x=random.randint(10,1000)
+#     y=random.randint(10,1000)
+#     m=add_together(x,y)
+#     return m
 
-@user_management.route("testcelery", methods=['GET', 'POST'])
-def testcelery():
-    x=random.randint(10,1000)
-    y=random.randint(10,1000)
-    add_together.delay(x, y)
+# @user_management.route("testcelery", methods=['GET', 'POST'])
+# def testcelery():
+#     x=random.randint(10,1000)
+#     y=random.randint(10,1000)
+#     add_together.delay(x, y)
  
-    return "rhis ran "
+#     return "rhis ran "
 
 
 

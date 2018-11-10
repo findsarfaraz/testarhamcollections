@@ -14,5 +14,5 @@ mail = Mail()
 from flask_wtf.csrf import CSRFProtect
 csrf = CSRFProtect()
 
-from flask_celery import Celery
-celery = Celery()
+# from flask_celery import Celery
+# celery = Celery()
