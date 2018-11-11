@@ -62,7 +62,7 @@ class ProductionConfig(Config):
     """
 
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'live.db')
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:welcome@123@localhost:3306/test_arham'
 
 
 app_config = {
