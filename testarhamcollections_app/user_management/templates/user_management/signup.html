@@ -10,7 +10,7 @@
 			<div class="card-panel z-depth-4">
 				<div class="row">
 					<h5 class="center-align">Signup @<a href={{ url_for('main_app.home') }}> Arhamcollections</a>, </h5>
-					<form action="{{url_for('user_management.signup')}}" class ="col s12" method="POST">
+					<form class ="col s12" method="POST">
 						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 						<div class="input-field col s12">
 							{# <i class="material-icons prefix">account_circle</i> #}
@@ -34,20 +34,18 @@
 					</form>
 
 				</div>
-				<div>
-				{% with messages = get_flashed_messages() %}
-						{% if messages %}
-						    {% for message in messages %}
-								<div class="row">
-								<div class="chip  red lighten-5">
-									{{ message }}
-									<i class="close material-icons">close</i>
-								</div>
-								</div>
-							{% endfor %}
-						{% endif %}
-				{% endwith %}
-				<p> You already have account with us, Go ahead and <a href={{ url_for('user_management.login') }}>Signin </a></p>
+				
+				<div class="col s12 m8 l6 offset-l3 m2">
+					<div class="row" id = "success" >
+						<div class="chip green lighten-5" id="successmessage">
+							<i class="close material-icons">close</i>
+						</div>
+					</div>
+					<div class="row" id="error">
+						<div class="chip red lighten-5" id="errormessage">
+							<i class="close material-icons">close</i>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -57,6 +55,75 @@
 	</div>
 </div>
 
+{% endblock %}
+
+{% block endjs %}
+<!-- <script  type="text/javascript" src="{{ url_for('main_app.static',filename='js/jquery.min.js')}}"></script> -->
+
+{{super()}}
+<script>
+	$(document).ready(function(event){
+		
+		$('#success').hide()
+		$('#error').hide()
+		var data;
+		
+		var url;
+		
+		url = "{{ url_for('user_management.signup')}}";
+		
+		// url=tempurl.replace('999999999','None');
+				
+		// alert(tempurl);
+
+		$('form').on('submit',function(event){
+				
+
+
+				$.ajax({
+
+					type:"POST",
+					url:url,
+					data: $('form').serialize()
+					// success:function(data) {
+     //            		$("#successmessage").html(data.success);
+     //            		$('#success').removeClass('hide').addClass('show');
+						
+     //            		// alert('succcess');
+
+					// 						},
+					// error: function(error)	{
+					// 	$("#errormessage").html(data.error);
+					// 	$('#error').removeClass('hide').addClass('show')
+						
+						// alert('error');
+											
+
+					})
+					.done(function(data){
+						if(data.success){
+							$('#success').show();
+							$("#successmessage").text(data.success);
+						}
+
+						else if (data.error){
+							$('#error').show();
+							$("#errormessage").text(data.error);
+						}
+						
+					});
+			
+				event.preventDefault();
+
+			});
+
+
+		});
+
+		
+
+
+</script>
 {% endblock %}
 
 

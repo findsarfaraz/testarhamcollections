@@ -80,13 +80,14 @@ def logout():
 @user_management.route("signup", methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        confirm_password = form.confirm_password.data
+    if request.method=='POST':
+        x=request.form.to_dict()
+        email = x['email']
+        password = x['password']
+        confirm_password =x['confirm_password']
         if password != confirm_password:
-            flash("ERROR! Passwords not matching.")
-            return render_template('user_management/signup.html', form=form)
+            return jsonify(error="ERROR! Passwords not matching.")
+            # return render_template('user_management/signup.html', form=form)
         else:
             try:
                 salt = hashlib.sha1(str(random.random())).hexdigest()[:10]
@@ -107,8 +108,9 @@ def signup():
                 send_confirmation_email(email)
             except exc.IntegrityError:
                 db.session.rollback()
-                flash('ERROR! Email ({}) already exists.'.format(form.email.data), '')
-                return render_template('user_management/signup.html', form=form)
+                error
+                return jsonify(error='ERROR! Email ({}) already exists.'.format(form.email.data))
+                # return render_template('user_management/signup.html', form=form)
     return render_template('user_management/signup.html', form=form)
 
 
