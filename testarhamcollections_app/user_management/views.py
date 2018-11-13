@@ -108,8 +108,8 @@ def signup():
                 send_confirmation_email(email)
             except exc.IntegrityError:
                 db.session.rollback()
-                error
-                return jsonify(error='ERROR! Email ({}) already exists.'.format(form.email.data))
+                error='ERROR! Email ({}) already exists.'.format(email)
+                return jsonify(error=error)
                 # return render_template('user_management/signup.html', form=form)
     return render_template('user_management/signup.html', form=form)
 
@@ -312,15 +312,20 @@ def wishlist():
 @user_management.route("forgotpassword", methods=['GET', 'POST'])
 def forgotpassword():
     form = ForgotPasswordForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+    if request.method=="POST":
+        x=request.form.to_dict()
+        email=x['email']
 
+        user = User.query.filter_by(email=email).first()
+        print(user)
         if user:
-            send_password_reset_email(form.email.data)
-            flash("Password reset email sent, Please check your inbox")
+              # send_password_reset_email(email)
+            return jsonify(success="Password reset email sent, Please check your inbox")
         else:
-            flash("email not registered with us")
-            return redirect(url_for('user_management.signup'))
+            print(email)
+            error="Your email {} not registered with us. Please signup with us".format('email')
+            # flash("email not registered with us")
+            return jsonify(error=error)
     return render_template('user_management/forgotpassword.html', form=form)
 
 
