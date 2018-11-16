@@ -1,5 +1,5 @@
 from flask_wtf import Form, FlaskForm
-from wtforms import StringField, PasswordField, SelectField, DateField, BooleanField
+from wtforms import StringField, PasswordField, SelectField, DateField, BooleanField, validators
 
 
 class SignupForm(FlaskForm):
@@ -22,8 +22,8 @@ class ProfileForm(FlaskForm):
 
 
 class AddAddressForm(FlaskForm):
-    first_name = StringField("First Name")
-    last_name = StringField("Last Name")
+    first_name = StringField("First Name", [validators.DataRequired()])
+    last_name = StringField("Last Name", [validators.DataRequired()])
     address1 = StringField("Address1")
     address2 = StringField("Address2")
     landmark = StringField("Land Mark")

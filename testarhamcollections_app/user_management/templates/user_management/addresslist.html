@@ -29,7 +29,7 @@
 			<p>{{ua.mobileno}}</p>
 		</div>
 		<div class="card-action">
-		<a href={{ url_for('user_management.editaddress',address_id=ua.address_id)}}>Edit</a>
+		<a href={{ url_for('user_management.addaddress',address_id=ua.address_id)}}>Edit</a>
 		<a href={{ url_for('user_management.deleteaddress',address_id=ua.address_id)}}>Delete</a>
 		{% if ua.default_flag==1 %} 
 				 <i class="material-icons">flag</i>{% endif %}

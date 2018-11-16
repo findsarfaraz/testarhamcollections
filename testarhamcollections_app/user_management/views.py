@@ -198,65 +198,70 @@ def addresslist():
 def addaddress(address_id=None):
     form = AddAddressForm()
     if request.method=='POST':
-        x=request.form.to_dict()
-        try:
-            x['default_flag']
-            x['default_flag']=True
-
-        except:
-            x['default_flag']=False
-
-        if address_id==None:
+        print('THIS FORM IS POSTED')
+        if form.validate():
+            x=request.form.to_dict()
             try:
-                data = Useraddress(first_name=x['first_name'], last_name=x['last_name'], address1=x['address1'], address2=x['address2'], landmark=x['landmark'], state=x['state'], city=x['city'], pincode=x['pincode'], mobileno=x['mobileno'], default_flag=x['default_flag'],user_id=current_user.id)
-                db.session.add(data)
-                db.session.commit()
-                if  x['default_flag']==True:
-                    try:
-                        defaultadddata=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id.address_id !=data.address_id).filter(Useraddress.default_flag==True).first()
-                        defaultadddata.default_flag=False
-                        db.session.commit()
-                    except:
-                        db.session.rollback()
-                        return jsonify(error="You don't have any default adddress" )
-                        # defaultadddata1=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id.address_id ==data.address_id).filter(Useraddress.default_flag==True).first()
-                        # defaultadddata1.default_flag=True
-                        # db.session.commit()
-                return jsonify(success='Address Added Successfully')
+                x['default_flag']
+                x['default_flag']=True
+
             except:
-                db.session.rollback()
-                return jsonify(error='Error in adding Address')
+                x['default_flag']=False
+
+            if address_id==None:
+                try:
+                    data = Useraddress(first_name=x['first_name'], last_name=x['last_name'], address1=x['address1'], address2=x['address2'], landmark=x['landmark'], state=x['state'], city=x['city'], pincode=x['pincode'], mobileno=x['mobileno'], default_flag=x['default_flag'],user_id=current_user.id)
+                    db.session.add(data)
+                    db.session.commit()
+                    if  x['default_flag']==True:
+                        try:
+                            defaultadddata=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id.address_id !=data.address_id).filter(Useraddress.default_flag==True).first()
+                            defaultadddata.default_flag=False
+                            db.session.commit()
+                        except:
+                            db.session.rollback()
+                            return jsonify(error="You don't have any default adddress" )
+                            # defaultadddata1=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id.address_id ==data.address_id).filter(Useraddress.default_flag==True).first()
+                            # defaultadddata1.default_flag=True
+                            # db.session.commit()
+                    return jsonify(success='Address Added Successfully')
+                except:
+                    db.session.rollback()
+                    return jsonify(error='Error in adding Address')
+            else:
+                try:
+                   
+                    data=Useraddress.query.filter(db.and_(address_id ==address_id, Useraddress.user_id==current_user.id)).first()
+                    data.first_name=x['first_name']
+                    data.last_name=x['last_name']
+                    data.address1=x['address1']
+                    data.address2=x['address2']
+                    data.landmark=x['landmark']
+                    data.state=x['state']
+                    data.city=x['city']
+                    data.pincode=x['pincode']
+                    data.mobileno=x['mobileno']
+                    data.default_flag=x['default_flag']
+                    data.user_id=current_user.id
+                    db.session.add(data)
+                    db.session.commit()
+                    if  x['default_flag']==True:
+                        try:
+                            defaultadddata=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id!=address_id).filter(Useraddress.default_flag==True).first()
+                            defaultadddata.default_flag=False
+                            db.session.commit()
+                            # defaultadddata1=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id==address_id).first()
+                            # defaultadddata1.default_flag=True
+                            # db.session.commit()
+                        except:
+                            print('THIS IS CURRENT {} WITH ADDRESS_ID {}'.format(address_id,current_user.id))
+                            
+                    return jsonify(success='Address Updated Successfully')
+                except:
+                    return jsonify(error='Address not found')
         else:
-            try:
-               
-                data=Useraddress.query.filter(db.and_(address_id ==address_id, Useraddress.user_id==current_user.id)).first()
-                data.first_name=x['first_name']
-                data.last_name=x['last_name']
-                data.address1=x['address1']
-                data.address2=x['address2']
-                data.landmark=x['landmark']
-                data.state=x['state']
-                data.city=x['city']
-                data.pincode=x['pincode']
-                data.mobileno=x['mobileno']
-                data.default_flag=x['default_flag']
-                data.user_id=current_user.id
-                db.session.add(data)
-                db.session.commit()
-                if  x['default_flag']==True:
-                    try:
-                        defaultadddata=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id!=address_id).filter(Useraddress.default_flag==True).first()
-                        defaultadddata.default_flag=False
-                        db.session.commit()
-                        # defaultadddata1=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id==address_id).first()
-                        # defaultadddata1.default_flag=True
-                        # db.session.commit()
-                    except:
-                        print('THIS IS CURRENT {} WITH ADDRESS_ID {}'.format(address_id,current_user.id))
-                        
-                return jsonify(success='Address Updated Successfully')
-            except:
-                return jsonify(error='Address not found')
+            print(dir(form.first_name.validators))
+            return jsonify(error=form.errors)
     else:
         if address_id==None:
             return render_template('user_management/addaddress.html', form=form,address_id=address_id)
@@ -268,7 +273,8 @@ def addaddress(address_id=None):
                 return render_template('user_management/addaddress.html', form=form,address_id=address_id)
             except:
                 return redirect(404)
-    return render_template('user_management/addaddress.html', form=form)
+
+    # return render_template('user_management/addaddress.html', form=form)
 
 
 @user_management.route("deleteaddress/<int:address_id>", methods=['GET', 'POST'])
@@ -288,7 +294,7 @@ def deleteaddress(address_id):
 def changepassword():
     form = ChangePasswordForm()
     user = User.query.filter_by(id=current_user.id).first()
-    if request.method=='POST':
+    if request.method=='POST' :
         x=request.form.to_dict()
         if check_password_hash(user.password, x['current_password'] + user.email_salt):
             if x['new_password'] ==x['confirm_password']:
@@ -451,3 +457,8 @@ def addresstest(address_id=None):
     # db.session.commit()
     return jsonify(data='Success')
 
+@user_management.route('showmessage')
+def showmessage():
+    msg="This is test"
+    return render_template('user_management/showmessage.html',msg=msg)
+    
