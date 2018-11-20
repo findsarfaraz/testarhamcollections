@@ -24,13 +24,13 @@ class ProfileForm(FlaskForm):
 class AddAddressForm(FlaskForm):
     first_name = StringField("First Name", [validators.DataRequired()])
     last_name = StringField("Last Name", [validators.DataRequired()])
-    address1 = StringField("Address1")
+    address1 = StringField("Address1", [validators.DataRequired(), validators.length(25, 150)])
     address2 = StringField("Address2")
-    landmark = StringField("Land Mark")
-    state = StringField("State")
-    city = StringField("City")
-    pincode = StringField("Pin Code")
-    mobileno = StringField("Mobile No")
+    landmark = StringField("Land Mark", [validators.DataRequired(), validators.length(15, 150)])
+    state = StringField("State", [validators.DataRequired()])
+    city = StringField("City", [validators.DataRequired()])
+    pincode = StringField("Pin Code", [validators.DataRequired(), validators.length(6, 6)])
+    mobileno = StringField("Mobile No", [validators.DataRequired(), validators.length(10, 10)])
     default_flag = BooleanField("Default Flag")
 
 

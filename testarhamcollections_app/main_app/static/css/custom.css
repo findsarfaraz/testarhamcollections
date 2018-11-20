@@ -127,3 +127,8 @@ a:hover#footernav {
   color: #D8000C;
   background-color: #FFBABA;
 }
+
+
+label[data-error]:after {
+    white-space: nowrap;
+}

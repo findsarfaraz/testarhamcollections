@@ -198,7 +198,6 @@ def addresslist():
 def addaddress(address_id=None):
     form = AddAddressForm()
     if request.method=='POST':
-        print('THIS FORM IS POSTED')
         if form.validate():
             x=request.form.to_dict()
             try:
@@ -224,14 +223,14 @@ def addaddress(address_id=None):
                             # defaultadddata1=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id.address_id ==data.address_id).filter(Useraddress.default_flag==True).first()
                             # defaultadddata1.default_flag=True
                             # db.session.commit()
-                    return jsonify(success='Address Added Successfully')
+                    return jsonify(success='Address Added Successfully',redirect='/addresslist')
                 except:
                     db.session.rollback()
                     return jsonify(error='Error in adding Address')
             else:
                 try:
-                   
-                    data=Useraddress.query.filter(db.and_(address_id ==address_id, Useraddress.user_id==current_user.id)).first()
+                    print('THIS IS LANDMARK {}'.format(x['landmark']))
+                    data=Useraddress.query.filter(address_id ==address_id).filter(Useraddress.user_id==current_user.id).first()
                     data.first_name=x['first_name']
                     data.last_name=x['last_name']
                     data.address1=x['address1']
@@ -256,12 +255,13 @@ def addaddress(address_id=None):
                         except:
                             print('THIS IS CURRENT {} WITH ADDRESS_ID {}'.format(address_id,current_user.id))
                             
-                    return jsonify(success='Address Updated Successfully')
+                    return jsonify(success='Address Updated Successfully',redirect='/addresslist')
                 except:
                     return jsonify(error='Address not found')
         else:
-            print(dir(form.first_name.validators))
-            return jsonify(error=form.errors)
+            x=jsonify(fielderror=form.errors)
+            print(x)
+            return jsonify(fielderror=form.errors)
     else:
         if address_id==None:
             return render_template('user_management/addaddress.html', form=form,address_id=address_id)
@@ -270,6 +270,7 @@ def addaddress(address_id=None):
                 data=Useraddress.query.filter(Useraddress.user_id==current_user.id).filter(Useraddress.address_id==address_id).first()
                 form = AddAddressForm(obj=data)
                 form.populate_obj(data)
+                print(form.landmark.data)
                 return render_template('user_management/addaddress.html', form=form,address_id=address_id)
             except:
                 return redirect(404)

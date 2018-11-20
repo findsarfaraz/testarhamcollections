@@ -8,6 +8,7 @@ function testalert(){
 function ShowMessage(data)
 	{
 
+	
 	if(data.success)
 					{
 					$('#success').show();
@@ -15,9 +16,16 @@ function ShowMessage(data)
 					$(".success-msg").text("");
 					$(".success-msg").append(' <i class="fa fa-check"></i>  ');
 					$(".success-msg").append(data.success);
+					if (data.redirect)
+								{
+								
+								window.location.href = data.redirect;
+
+								}
 					}
 	else if (data.error)
 					{
+
 					$('#error').show();
 					$('#success').hide();
 					$(".error-msg").text("");
