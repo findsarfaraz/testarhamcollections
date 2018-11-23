@@ -39,7 +39,7 @@ function ShowMessage(data)
 $(".button-collapse").sideNav();
 
 $('.datepicker').pickadate({
-format: 'dd/mm/yyyy',
+format: 'yyyy-mm-dd',
 selectMonths: true, // Creates a dropdown to control month
 selectYears: 100, // Creates a dropdown of 15 years to control year,
 today: 'Today',

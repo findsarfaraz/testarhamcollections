@@ -18,7 +18,7 @@ class ProfileForm(FlaskForm):
     last_name = StringField("Last Name")
     gender = SelectField("Gender", choices=[('male', 'Male'), ('female', 'Female')])
     mobile_number = StringField("Contact No")
-    dateofbirth = DateField("Date Of Birth", format='%d/%m/%Y')
+    dateofbirth = DateField("Date Of Birth", format='%Y-%m-%d')
 
 
 class AddAddressForm(FlaskForm):

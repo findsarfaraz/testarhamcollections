@@ -101,16 +101,9 @@
 
 					})
 					.done(function(data){
-						if(data.success){
-							$('#success').show();
-							$("#successmessage").text(data.success);
-						}
+					
+					ShowMessage(data);
 
-						else if (data.error){
-							$('#error').show();
-							$("#errormessage").text(data.error);
-						}
-						
 					});
 			
 				event.preventDefault();

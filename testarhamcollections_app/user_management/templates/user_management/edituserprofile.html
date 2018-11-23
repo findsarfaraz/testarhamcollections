@@ -7,8 +7,9 @@
 			</span>
 		</div>
 	</div>
-	<form action="{{url_for('user_management.edituserprofile')}}" method="POST">{{form.csrf_token}}
+	<form method="POST">
 		<div class="row">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
 					<input id="first_name" type="text" name="first_name" value="{{form.first_name.data}}">
@@ -51,9 +52,85 @@
 			</div>
 		</div>
 	</form>
+	<div class="col s12 m8 l6 offset-l3 m2">
+		<div class="row">
+			<div class="row" id ="success">
+				 <div class="success-msg">
+					
+				 </div>					 
+			</div>
+			<div class="row" id ="error">
+				 <div class="error-msg">
+					
+				 </div>					 
+			</div>
+		</div>
+	</div>	
 </div>
 	
 
 
 {% endblock %}
 
+
+
+
+{% block endjs%}
+{{super()}}
+<script>
+
+
+$(document).ready(function(event)
+	{
+	$('#success').hide()
+	$('#error').hide()
+
+	var url;
+	url = "{{ url_for('user_management.edituserprofile')}}";
+	
+
+		$('form').on('submit',function(event)
+		{
+
+		// $('#first_name').removeClass('invalid');
+		// $('#first_name').removeAttr( "aria-invalid" )
+		// $('#last_name').removeClass('invalid');
+		// $('#last_name').removeAttr( "aria-invalid" )
+		$.ajax({
+				type:"POST",
+				url:url,
+				data:$('form').serialize(),
+				success:function(data){
+					alert(data.success)
+				}
+
+				})
+		.done(function(data){
+
+					
+					ShowMessage(data);
+
+					// if (data.fielderror)
+					// 	{
+					// 	$.each(data.fielderror,function(datakey,datavalue){
+					// 		$('form input').each(function(key,value){
+					// 			if (this.id==datakey){
+					// 				$('label[for="'+datakey +'"]').attr('data-error',datavalue);
+					// 				$(this).addClass('invalid');
+					// 				$(this).prop('aria-valid',"true");
+					// 				$('label[for="'+datakey +'"]').addClass('active');
+					// 				}
+
+					// 		});    
+					// 	});
+					// 	}
+							});
+	event.preventDefault();
+	});
+
+});
+
+
+</script>
+
+{% endblock%}

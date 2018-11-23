@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app, session,abort,jsonify
+from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app, session, abort, jsonify
 from forms import SignupForm, LoginForm, ProfileForm, AddAddressForm, ChangePasswordForm, ForgotPasswordForm, PasswordResetForm
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import (User, Userroles, Userrolesmapping, Userprofile, Useraddress
@@ -21,9 +21,10 @@ from flask_principal import identity_loaded
 # from ..extensions import celery
 # from celery.decorators import periodic_task
 # from celery.task.schedules import crontab
-import random 
+import random
 
 from datetime import timedelta
+
 
 
 user_management = Blueprint('user_management', __name__, url_prefix="/", static_folder='./static', static_url_path="main_app/static", template_folder='./templates')
@@ -47,16 +48,16 @@ class AddressPermission(Permission):
 @user_management.route("login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if request.method=="POST":
-        x=request.form.to_dict()
+    if request.method == "POST":
+        x = request.form.to_dict()
         # print('THIS IS IS A USER {} '.format(x['email']))
         user = User.query.filter_by(email=x['email']).first()
-        
+
         if user:
             if check_password_hash(user.password, x['password'] + user.email_salt):
                 login_user(user)
                 identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
-                return jsonify(success='logged in',redirect='/')
+                return jsonify(success='logged in', redirect='/')
             else:
                 return jsonify(error='Incorrect password')
         else:
@@ -80,11 +81,11 @@ def logout():
 @user_management.route("signup", methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
-    if request.method=='POST':
-        x=request.form.to_dict()
+    if request.method == 'POST':
+        x = request.form.to_dict()
         email = x['email']
         password = x['password']
-        confirm_password =x['confirm_password']
+        confirm_password = x['confirm_password']
         if password != confirm_password:
             return jsonify(error="ERROR! Passwords not matching.")
             # return render_template('user_management/signup.html', form=form)
@@ -108,7 +109,7 @@ def signup():
                 send_confirmation_email(email)
             except exc.IntegrityError:
                 db.session.rollback()
-                error='ERROR! Email ({}) already exists.'.format(email)
+                error = 'ERROR! Email ({}) already exists.'.format(email)
                 return jsonify(error=error)
                 # return render_template('user_management/signup.html', form=form)
     return render_template('user_management/signup.html', form=form)
@@ -164,19 +165,36 @@ def confirm_email(token):
 @user_management.route("edituserprofile", methods=['GET', 'POST'])
 @login_required
 def edituserprofile():
-    try:
-        userprofile = Userprofile.query.filter_by(user_id=current_user.id).first()
-        form = ProfileForm(obj=userprofile)
-        form.populate_obj(userprofile)
-    except:
-        form=ProfileForm()
-
-    if form.validate_on_submit():
-        data=Userprofile(first_name=form.first_name.data,last_name=form.last_name.data,gender=form.gender.data,dateofbirth=form.dateofbirth.data,user_id=current_user.id)
-        db.session.add(data)
-        db.session.commit()
-        return render_template('user_management/edituserprofile.html', form=form)
+    form = ProfileForm()
+    if request.method == 'POST':
+        print('FORM IS POSTED BY POST')
+        if form.validate():
+            x = request.form.to_dict()
+            try:
+                data=Userprofile.query.filter_by(user_id=current_user.id).first()
+                data.first_name=x['first_name'] 
+                data.last_name=x['last_name']
+                data.dateofbirth=x['dateofbirth']
+                data.mobile_number=x['mobile_number']
+                data.gender=x['gender']
+                db.session.add(data)
+                db.session.commit()
+                return jsonify(success='Updated your profile successfully')
+            except:
+                print('ERRROR HAPPENED')
+                db.session.rollback()
+                return jsonify(error='Error while updating')    
+    else:
+        try:
+            userprofile = Userprofile.query.filter_by(user_id=current_user.id).first()
+            form = ProfileForm(obj=userprofile)
+            form.populate_obj(userprofile)
+            return render_template('user_management/edituserprofile.html', form=form)
+        except: 
+            return jsonify(error='Unable to find profilie')
     return render_template('user_management/edituserprofile.html', form=form)
+
+
 
 
 @user_management.route("accountpage", methods=['GET', 'POST'])
@@ -196,6 +214,7 @@ def addresslist():
 @user_management.route("addaddress/<int:address_id>", methods=['GET', 'POST'])
 @login_required
 def addaddress(address_id=None):
+    # x=1/0
     form = AddAddressForm()
     if request.method=='POST':
         if form.validate():
@@ -229,8 +248,9 @@ def addaddress(address_id=None):
                     return jsonify(error='Error in adding Address')
             else:
                 try:
-                    print('THIS IS LANDMARK {}'.format(x['landmark']))
-                    data=Useraddress.query.filter(address_id ==address_id).filter(Useraddress.user_id==current_user.id).first()
+                    
+                    data=Useraddress.query.filter(Useraddress.address_id ==address_id).filter(Useraddress.user_id==current_user.id).first()
+                    print('this is useraddress {}'.format(data.address_id))
                     data.first_name=x['first_name']
                     data.last_name=x['last_name']
                     data.address1=x['address1']
@@ -261,6 +281,7 @@ def addaddress(address_id=None):
         else:
             x=jsonify(fielderror=form.errors)
             print(x)
+
             return jsonify(fielderror=form.errors)
     else:
         if address_id==None:
