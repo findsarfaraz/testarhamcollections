@@ -347,7 +347,7 @@ def forgotpassword():
         user = User.query.filter_by(email=email).first()
         print(user)
         if user:
-              # send_password_reset_email(email)
+            send_password_reset_email(email)
             return jsonify(success="Password reset email sent, Please check your inbox")
         else:
             print(email)
@@ -364,7 +364,7 @@ def send_password_reset_email(user_email):
         'user_management.confirm_reset_email',
         token=confirm_serializer.dumps(user_email, salt='email-confirmation-salt'),
         _external=True)
-
+    print(confirm_url)
     html = render_template(
         'user_management/email_password_reset.html',
         confirm_url=confirm_url)
@@ -372,34 +372,52 @@ def send_password_reset_email(user_email):
     msg = Message('Password Reset Arhamollections.com', sender='registration@arhamcollections.com', recipients=[user_email])
     msg.html = html
 
-    mail.send(msg)
+    # mail.send(msg)
 
 
 @user_management.route("reset/<token>")
 def confirm_reset_email(token):
+    print('THIS IS STARTED STARTED STARTED')
     try:
         confirm_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        print('Tis is userl confirm {}'.format(confirm_serializer))
         email = confirm_serializer.loads(token, salt='email-confirmation-salt', max_age=18000)
+        print(email)
     except:
         flash('The confirmation link is invalid or has expired.', 'Error')
         return redirect(url_for('user_management.forgotpassword'))
 
     user = User.query.filter_by(email=email).first()
-
+    
     if user:
         form = PasswordResetForm()
-        if form.validate_on_submit():
-            if form.new_password.data == form.confirm_password.data:
-                password_hash = generate_password_hash(form.new_password.data + user.email_salt)
-                user.password = password_hash
-                db.session.add(user)
-                db.session.commit()
-                return redirect('user_management.login')
-        return render_template('user_management/passwordreset.html', form=form)
+        return render_template('user_management/passwordreset.html', form=form,email=email)
     else:
-        flash("User not in registered.")
-        return redirect(url_for('user_management.signup'))
-    return render_template('user_management/passwordreset.html', form=form)
+        abort(404)
+
+  
+user_management.route("resetpassword/email",methods=['GET','POST'])
+def resetpassword(email):
+    if request.method=="POST":
+            user=User.query.filter_by(email=email).first()
+            if form.validate():
+                x=request.form.to_dict()
+                if x['new_password.data'] == x['confirm_password.data']:
+                    password_hash = generate_password_hash(x['new_password.data'] + user.email_salt)
+                    user.password = password_hash
+                    db.session.add(user)
+                    db.session.commit()
+                    success='Password resetted for {}'.format(email)
+                    return jsonify(success=success)
+                else:
+                    jsonify(error='Both password must be same')
+            else:
+                return jsonify(error='Error in form')
+
+
+
+
+
 
 
 @user_management.route("testprocedure", methods=['GET', 'POST'])
@@ -483,4 +501,10 @@ def addresstest(address_id=None):
 def showmessage():
     msg="This is test"
     return render_template('user_management/showmessage.html',msg=msg)
+
+@user_management.route("test/<token>")
+def test(token):
+    print(token)
+    return token
+
     
