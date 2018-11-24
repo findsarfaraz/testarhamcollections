@@ -3,9 +3,9 @@ from wtforms import StringField, PasswordField, SelectField, DateField, BooleanF
 
 
 class SignupForm(FlaskForm):
-    email = StringField("Email")
-    password = PasswordField("Password")
-    confirm_password = PasswordField("Confirm_Password")
+    email = StringField("Email", [validators.DataRequired(), validators.Email()])
+    password = PasswordField("Password", [validators.DataRequired()])
+    confirm_password = PasswordField("Confirm_Password", [validators.DataRequired()])
 
 
 class LoginForm(FlaskForm):

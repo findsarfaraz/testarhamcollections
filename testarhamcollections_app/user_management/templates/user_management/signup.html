@@ -35,24 +35,24 @@
 
 				</div>
 				
-				<div class="col s12 m8 l6 offset-l3 m2">
-					<div class="row" id = "success" >
-						<div class="chip green lighten-5" id="successmessage">
-							<i class="close material-icons">close</i>
-						</div>
+			
+					<div class="row">
+						<div class="row" id ="success">
+						<div class="success-msg">
+
+					</div>					 
 					</div>
-					<div class="row" id="error">
-						<div class="chip red lighten-5" id="errormessage">
-							<i class="close material-icons">close</i>
-						</div>
+						<div class="row" id ="error">
+						<div class="error-msg">
+
+					</div>					 
+					</div>
 					</div>
 				</div>
-			</div>
 		</div>
 		</div>
 	</div>
-	<div class="col s12 m2 l3">
-	</div>
+	
 </div>
 
 {% endblock %}
@@ -101,8 +101,23 @@
 
 					})
 					.done(function(data){
-					
+
 					ShowMessage(data);
+
+						if (data.fielderror)
+						{
+						$.each(data.fielderror,function(datakey,datavalue){
+							$('form input').each(function(key,value){
+								if (this.id==datakey){
+									$('label[for="'+datakey +'"]').attr('data-error',datavalue);
+									$(this).addClass('invalid');
+									$(this).prop('aria-valid',"true");
+									$('label[for="'+datakey +'"]').addClass('active');
+									}
+
+							});    
+						});
+						}
 
 					});
 			

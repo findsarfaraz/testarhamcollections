@@ -29,7 +29,7 @@ function ShowMessage(data)
 					$('#error').show();
 					$('#success').hide();
 					$(".error-msg").text("");
-					$(".success-msg").append(' <i class="fa fa-times-circle"></i> ');
+					$(".error-msg").append(' <i class="fa fa-times-circle"></i> ');
 					$(".error-msg").append(data.error);
 					}
 	}

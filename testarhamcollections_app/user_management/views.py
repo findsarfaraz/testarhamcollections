@@ -82,35 +82,39 @@ def logout():
 def signup():
     form = SignupForm()
     if request.method == 'POST':
-        x = request.form.to_dict()
-        email = x['email']
-        password = x['password']
-        confirm_password = x['confirm_password']
-        if password != confirm_password:
-            return jsonify(error="ERROR! Passwords not matching.")
+        if form.validate():
+            x = request.form.to_dict()
+            email = x['email']
+            password = x['password']
+            confirm_password = x['confirm_password']
+            if password != confirm_password:
+                return jsonify(error="ERROR! Passwords not matching.")
             # return render_template('user_management/signup.html', form=form)
+            else:
+                try:
+                    salt = hashlib.sha1(str(random.random())).hexdigest()[:10]
+                    password_hash = generate_password_hash(password + salt, 'sha256')
+                    data = User(email=email, password=password_hash, email_salt=salt)
+                    db.session.add(data)
+                    db.session.commit()
+
+                    userrole = Userroles.query.filter_by(role='User').first()
+                    user_role_mapping = Userrolesmapping(user_id=data.id, role_id=userrole.role_id)
+                    db.session.add(user_role_mapping)
+                    db.session.commit()
+
+                    userprofile = Userprofile(user_id=data.id)
+                    db.session.add(userprofile)
+                    db.session.commit()
+
+                    send_confirmation_email(email)
+                    return jsonify(success='Please check you email')
+                except exc.IntegrityError:
+                    db.session.rollback()
+                    error = 'ERROR! Email ({}) already exists.'.format(email)
+                    return jsonify(error=error)
         else:
-            try:
-                salt = hashlib.sha1(str(random.random())).hexdigest()[:10]
-                password_hash = generate_password_hash(password + salt, 'sha256')
-                data = User(email=email, password=password_hash, email_salt=salt)
-                db.session.add(data)
-                db.session.commit()
-
-                userrole = Userroles.query.filter_by(role='User').first()
-                user_role_mapping = Userrolesmapping(user_id=data.id, role_id=userrole.role_id)
-                db.session.add(user_role_mapping)
-                db.session.commit()
-
-                userprofile = Userprofile(user_id=data.id)
-                db.session.add(userprofile)
-                db.session.commit()
-
-                send_confirmation_email(email)
-            except exc.IntegrityError:
-                db.session.rollback()
-                error = 'ERROR! Email ({}) already exists.'.format(email)
-                return jsonify(error=error)
+            return jsonify(fielderror=form.errors)
                 # return render_template('user_management/signup.html', form=form)
     return render_template('user_management/signup.html', form=form)
 
