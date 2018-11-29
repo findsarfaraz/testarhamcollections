@@ -16,6 +16,7 @@ function ShowMessage(data)
 					$(".success-msg").text("");
 					$(".success-msg").append(' <i class="fa fa-check"></i>  ');
 					$(".success-msg").append(data.success);
+					$(".success-msg").append('<span class="right"><i class="fa fa-times" id="successmsg" onclick="hidemsg(this.id)"></i></span>');
 					if (data.redirect)
 								{
 								
@@ -31,6 +32,7 @@ function ShowMessage(data)
 					$(".error-msg").text("");
 					$(".error-msg").append(' <i class="fa fa-times-circle"></i> ');
 					$(".error-msg").append(data.error);
+					$(".error-msg").append('<span class="right"><i class="fa fa-times" id="errormsg" onclick="hidemsg(this.id)"></i></span>');
 					}
 	}
 
@@ -65,4 +67,12 @@ stopPropagation: false // Stops event propagation
 
 $('select').material_select();
 
+function hidemsg(name){
+	if(name==='errormsg'){
+		$('#error').hide();
+	}
+	else if(name==='successmsg'){
+		$('#success').hide();
+	}
+}
 /*materialize css js script required for components*/

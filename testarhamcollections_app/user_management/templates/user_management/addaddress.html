@@ -14,19 +14,19 @@
 			<div class="row">
 				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="first_name" placeholder="Placeholder" type="text" name="first_name" class="validate" value={%if address_id==None%}{{""}}{%else%}"{{form.first_name.data}}"{%endif%}>
+					<input id="first_name"  type="text" name="first_name" class="validate" value={%if address_id==None%}{{""}}{%else%}"{{form.first_name.data}}"{%endif%}>
 					<label for="first_name" >First Name</label>
 				</div>
 			</div>
 			<div class="row">	
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="last_name"  placeholder="Placeholder" type="text" name="last_name" class="validate" value={%if address_id==None%}{{""}}{%else%}"{{form.last_name.data}}"{%endif%} >
+					<input id="last_name"   type="text" name="last_name" class="validate" value={%if address_id==None%}{{""}}{%else%}"{{form.last_name.data}}"{%endif%} >
 					<label for="last_name" >Last Name</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="landmark" placeholder="Placeholder" type="text" name="landmark" class="validate" value={%if address_id==None%}{{""}}{%else%}"{{form.landmark.data}}"{%endif%}>
+					<input id="landmark"  type="text" name="landmark" class="validate" value={%if address_id==None%}{{""}}{%else%}"{{form.landmark.data}}"{%endif%}>
 					<label for="landmark">Landmark</label>
 				</div>
 			</div>
@@ -119,10 +119,10 @@ $(document).ready(function(event)
 		$('form').on('submit',function(event)
 		{
 
-		$('#first_name').removeClass('invalid');
-		$('#first_name').removeAttr( "aria-invalid" )
-		$('#last_name').removeClass('invalid');
-		$('#last_name').removeAttr( "aria-invalid" )
+		// $('#first_name').removeClass('invalid');
+		// $('#first_name').removeAttr( "aria-invalid" )
+		// $('#last_name').removeClass('invalid');
+		// $('#last_name').removeAttr( "aria-invalid" )
 		$.ajax({
 				type:"POST",
 				url:url,

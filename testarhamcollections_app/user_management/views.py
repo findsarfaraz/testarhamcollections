@@ -49,19 +49,20 @@ class AddressPermission(Permission):
 def login():
     form = LoginForm()
     if request.method == "POST":
-        x = request.form.to_dict()
-        # print('THIS IS IS A USER {} '.format(x['email']))
-        user = User.query.filter_by(email=x['email']).first()
-
-        if user:
-            if check_password_hash(user.password, x['password'] + user.email_salt):
-                login_user(user)
-                identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
-                return jsonify(success='logged in', redirect='/')
+        if form.validate():
+            x = request.form.to_dict()
+            user = User.query.filter_by(email=x['email']).first()
+            if user:
+                if check_password_hash(user.password, x['password'] + user.email_salt):
+                    login_user(user)
+                    identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+                    return jsonify(success='logged in', redirect='/')
+                else:
+                    return jsonify(error='Incorrect password')
             else:
-                return jsonify(error='Incorrect password')
+                return jsonify(error='Username not registered')
         else:
-            return jsonify(error='Username not registered')
+            return jsonify(fielderror=form.errors)
     else:
         return render_template('user_management/loginpage.html', form=form)
 
@@ -107,7 +108,7 @@ def signup():
                     db.session.add(userprofile)
                     db.session.commit()
 
-                    send_confirmation_email(email)
+                    # send_confirmation_email(email)
                     return jsonify(success='Please check you email')
                 except exc.IntegrityError:
                     db.session.rollback()
@@ -185,9 +186,10 @@ def edituserprofile():
                 db.session.commit()
                 return jsonify(success='Updated your profile successfully')
             except:
-                print('ERRROR HAPPENED')
                 db.session.rollback()
-                return jsonify(error='Error while updating')    
+                return jsonify(error='Error while updating')
+        else:
+            return jsonify(fielderror=form.errors)    
     else:
         try:
             userprofile = Userprofile.query.filter_by(user_id=current_user.id).first()
@@ -321,18 +323,21 @@ def changepassword():
     form = ChangePasswordForm()
     user = User.query.filter_by(id=current_user.id).first()
     if request.method=='POST' :
-        x=request.form.to_dict()
-        if check_password_hash(user.password, x['current_password'] + user.email_salt):
-            if x['new_password'] ==x['confirm_password']:
-                password_hash = generate_password_hash(x['new_password'] + user.email_salt, 'sha256')
-                user.password = password_hash
-                db.session.add(user)
-                db.session.commit()
-                return jsonify(success='Password Changed Successfully')
+        if form.validate():
+            x=request.form.to_dict()
+            if check_password_hash(user.password, x['current_password'] + user.email_salt):
+                if x['new_password'] ==x['confirm_password']:
+                    password_hash = generate_password_hash(x['new_password'] + user.email_salt, 'sha256')
+                    user.password = password_hash
+                    db.session.add(user)
+                    db.session.commit()
+                    return jsonify(success='Password Changed Successfully')
+                else:
+                    return jsonify(error='New Password is not matching with Confirm Password')
             else:
-                return jsonify(error='New Password is not matching with Confirm Password')
+                return jsonify(error='Inccorrect password')
         else:
-            return jsonify(error='Inccorrect password')
+            return jsonify(fielderror=form.errors)
     return render_template('user_management/changepassword.html', form=form)
 
 
@@ -345,19 +350,21 @@ def wishlist():
 def forgotpassword():
     form = ForgotPasswordForm()
     if request.method=="POST":
-        x=request.form.to_dict()
-        email=x['email']
-
-        user = User.query.filter_by(email=email).first()
-        print(user)
-        if user:
-            send_password_reset_email(email)
-            return jsonify(success="Password reset email sent, Please check your inbox")
+        if form.validate():
+            x=request.form.to_dict()
+            email=x['email']
+            user = User.query.filter_by(email=email).first()
+            print(user)
+            if user:
+                send_password_reset_email(email)
+                return jsonify(success="Password reset email sent, Please check your inbox")
+            else:
+                print(email)
+                error="Your email {} not registered with us. Please signup with us".format('email')
+                # flash("email not registered with us")
+                return jsonify(error=error)
         else:
-            print(email)
-            error="Your email {} not registered with us. Please signup with us".format('email')
-            # flash("email not registered with us")
-            return jsonify(error=error)
+            return jsonify(fielderror=form.errors)
     return render_template('user_management/forgotpassword.html', form=form)
 
 

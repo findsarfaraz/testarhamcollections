@@ -17,7 +17,7 @@
 							<label for="email">Email</label>
 						</div>
 						<div class="input-field col s12">
-							<input id="password" name="password" type="password">
+							<input id="password"  class="validate" name="password" type="password">
 							<label for="password">Password</label>
 						</div>
 						<div>
@@ -88,6 +88,20 @@ $(document).ready(function(event){
 		.done(function(data){
 
 						ShowMessage(data);
+						if (data.fielderror)
+						{
+						$.each(data.fielderror,function(datakey,datavalue){
+							$('form input').each(function(key,value){
+								if (this.id==datakey){
+									$('label[for="'+datakey +'"]').attr('data-error',datavalue);
+									$(this).addClass('invalid');
+									$(this).prop('aria-valid',"true");
+									$('label[for="'+datakey +'"]').addClass('active');
+									}
+
+							});    
+						});
+						}
 
 		});
 
@@ -97,6 +111,7 @@ $(document).ready(function(event){
 
 
 });
+
 
 </script>
 

@@ -12,7 +12,7 @@
 			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="first_name" type="text" name="first_name" value="{{form.first_name.data}}">
+					<input id="first_name" type="text"  name="first_name" value="{{form.first_name.data}}">
 					<label for="first_name">First Name</label>
 				</div>
 			</div>
@@ -34,7 +34,7 @@
 			</div>
 			<div class="row">
 				<div class="input-field col s12 m8 l6 offset-l3 m2">
-					<input id="mobile_number" type="text" name="mobile_number" value="{{form.mobile_number.data}}">
+					<input id="mobile_number" type="text" class="validate" name="mobile_number" value="{{form.mobile_number.data}}">
 					<label for="mobile_number">Moblie Number</label>
 				</div>
 			</div>
@@ -100,9 +100,7 @@ $(document).ready(function(event)
 				type:"POST",
 				url:url,
 				data:$('form').serialize(),
-				success:function(data){
-					alert(data.success)
-				}
+
 
 				})
 		.done(function(data){
@@ -110,20 +108,20 @@ $(document).ready(function(event)
 					
 					ShowMessage(data);
 
-					// if (data.fielderror)
-					// 	{
-					// 	$.each(data.fielderror,function(datakey,datavalue){
-					// 		$('form input').each(function(key,value){
-					// 			if (this.id==datakey){
-					// 				$('label[for="'+datakey +'"]').attr('data-error',datavalue);
-					// 				$(this).addClass('invalid');
-					// 				$(this).prop('aria-valid',"true");
-					// 				$('label[for="'+datakey +'"]').addClass('active');
-					// 				}
+					if (data.fielderror)
+						{
+						$.each(data.fielderror,function(datakey,datavalue){
+							$('form input').each(function(key,value){
+								if (this.id==datakey){
+									$('label[for="'+datakey +'"]').attr('data-error',datavalue);
+									$(this).addClass('invalid');
+									$(this).prop('aria-valid',"true");
+									$('label[for="'+datakey +'"]').addClass('active');
+									}
 
-					// 		});    
-					// 	});
-					// 	}
+							});    
+						});
+						}
 							});
 	event.preventDefault();
 	});

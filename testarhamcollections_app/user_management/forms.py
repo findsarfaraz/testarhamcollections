@@ -9,15 +9,15 @@ class SignupForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField("Email")
-    password = PasswordField("Password")
+    email = StringField("Email", [validators.Email()])
+    password = PasswordField("Password", [validators.DataRequired()])
 
 
 class ProfileForm(FlaskForm):
     first_name = StringField("First Name")
     last_name = StringField("Last Name")
     gender = SelectField("Gender", choices=[('male', 'Male'), ('female', 'Female')])
-    mobile_number = StringField("Contact No")
+    mobile_number = StringField("Contact No", [validators.length(10, 10)])
     dateofbirth = DateField("Date Of Birth", format='%Y-%m-%d')
 
 
@@ -35,15 +35,15 @@ class AddAddressForm(FlaskForm):
 
 
 class ChangePasswordForm(FlaskForm):
-    current_password = PasswordField("Current Password")
-    new_password = PasswordField("New Password")
-    confirm_password = PasswordField("Confirm Password")
+    current_password = PasswordField("Current Password", [validators.DataRequired()])
+    new_password = PasswordField("New Password", [validators.DataRequired()])
+    confirm_password = PasswordField("Confirm Password", [validators.DataRequired()])
 
 
 class ForgotPasswordForm(FlaskForm):
-    email = StringField("Registered Email")
+    email = StringField("Registered Email", [validators.DataRequired(), validators.Email()])
 
 
 class PasswordResetForm(FlaskForm):
-    new_password = PasswordField("New Password")
-    confirm_password = PasswordField("Confirm Password")
+    new_password = PasswordField("New Password", [validators.DataRequired()])
+    confirm_password = PasswordField("Confirm Password", [validators.DataRequired()])
