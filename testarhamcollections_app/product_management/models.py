@@ -25,6 +25,7 @@ class CategoryMaster(db.Model):
 
     category_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     category_name = db.Column(db.String(512), nullable=False)
+    submenu_id = db.Column(db.Integer, db.ForeignKey('submenumaster.submenu_id'), nullable=False)
     creation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     updation_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

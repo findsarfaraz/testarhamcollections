@@ -35,7 +35,7 @@ def addproduct(product_id=None):
             db.session.commit()
             return redirect(url_for('product_management.addproductimage', product_id=product_id))
         return render_template("product_management/addproduct.html", form=form, product_id=product_id)
-
+x
 
 @product_management.route("addproductimage/<int:product_id>", methods=['POST', 'GET'])
 def addproductimage(product_id):

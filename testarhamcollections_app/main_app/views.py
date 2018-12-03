@@ -110,6 +110,6 @@ def admin():
     return render_template('main_app/admin.html')
 
 
-@main_app.route("fblogin",methods=['GET','POST'])
+@main_app.route("fblogin", methods=['GET', 'POST'])
 def fblogin():
     return render_template('main_app/fblogin.html')
